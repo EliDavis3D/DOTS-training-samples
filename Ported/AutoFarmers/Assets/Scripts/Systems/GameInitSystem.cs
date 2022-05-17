@@ -19,14 +19,13 @@ public partial struct GameInitSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        var allocator = state.WorldUnmanaged.UpdateAllocator.ToAllocator;
         var config = SystemAPI.GetSingleton<GameConfig>();
 
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-        var allocator = state.WorldUnmanaged.UpdateAllocator.ToAllocator;
-
-        GroundUtilities.GenerateGroundAndRocks(ecb, config.MapSize);
+        GroundUtilities.GenerateGroundAndRocks(ecb, config, allocator);
 
         // Initial Farmer
         var farmers = CollectionHelper.CreateNativeArray<Entity>(config.InitialFarmerCount, allocator);

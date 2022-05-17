@@ -6,6 +6,9 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
     public UnityEngine.GameObject FarmerPrefab;
     public int InitialFarmers;
     public int2 MapSize;
+
+    public UnityEngine.GameObject GroundTileTilledPrefab;
+    public UnityEngine.GameObject GroundTileUntilledPrefab;
 }
 
 class GameConfigBaker : Baker<GameConfigAuthoring>
@@ -16,7 +19,10 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
         {
             FarmerPrefab = GetEntity(authoring.FarmerPrefab),
             InitialFarmerCount = authoring.InitialFarmers,
-            MapSize = authoring.MapSize
+            MapSize = authoring.MapSize,
+
+            GroundTileTilledPrefab = GetEntity(authoring.GroundTileTilledPrefab),
+            GroundTileUntilledPrefab = GetEntity(authoring.GroundTileUntilledPrefab),
         });
     }
 }

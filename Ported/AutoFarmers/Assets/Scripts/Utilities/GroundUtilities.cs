@@ -1,20 +1,47 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
-public static class GroundUtilities
+static class GroundUtilities
 {
-    public static void GenerateGroundAndRocks(EntityCommandBuffer ecb, in int2 mapSize)
+    public static void GenerateGroundAndRocks(EntityCommandBuffer ecb, in GameConfig config, in Allocator allocator)
     {
+        int2 mapSize = config.MapSize;
+
+        NativeArray<Entity> groundTileEntities = CollectionHelper.CreateNativeArray<Entity>(
+            mapSize.x * mapSize.y, allocator);
+        ecb.Instantiate(config.GroundTileUntilledPrefab, groundTileEntities);
+
         // Create Ground
         Entity groundEntity = ecb.CreateEntity();
+        ecb.AddComponent<Ground>(groundEntity);
         DynamicBuffer<GroundTile> groundTiles = ecb.AddBuffer<GroundTile>(groundEntity);
         groundTiles.Length = mapSize.x * mapSize.y;
-        for (int i = 0; i < mapSize.x * mapSize.y; ++i)
+
+        Random randomGenerator = new Random(124536789);
+        for (int y = 0; y < mapSize.y; ++y)
         {
-            groundTiles[i] = new GroundTile
+            for (int x = 0; x < mapSize.x; ++x)
             {
-                tileState = GroundTileState.Open
-            };
+                int index = mapSize.x * y + x;
+
+                GroundTileState newState = GroundTileState.Open;
+                if (randomGenerator.NextInt(4) == 0)
+                {
+                    newState = GroundTileState.Tilled;
+                }
+
+                groundTiles[index] = new GroundTile
+                {
+                    tileState = newState
+                };
+
+                ecb.SetComponent(groundTileEntities[index], new Translation
+                {
+                    Value = new float3(x, 0, y)
+                });
+            }
         }
     }
 }
