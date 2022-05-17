@@ -1,7 +1,6 @@
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
-using Unity.Rendering;
 
 readonly partial struct PlantGrowingAspect : IAspect<PlantGrowingAspect>
 {

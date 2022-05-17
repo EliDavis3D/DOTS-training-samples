@@ -9,5 +9,7 @@ struct GameConfig : IComponentData
     public int2 MapSize;
 
     public Entity PlantPrefab;
+    
+    public float PlantIncubationTime;
 
 }

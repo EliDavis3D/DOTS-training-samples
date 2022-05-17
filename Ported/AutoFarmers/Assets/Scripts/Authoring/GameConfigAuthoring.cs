@@ -4,9 +4,12 @@ using Unity.Mathematics;
 class GameConfigAuthoring : UnityEngine.MonoBehaviour
 {
     public UnityEngine.GameObject FarmerPrefab;
-    public UnityEngine.GameObject PlantPrefab;
     public int InitialFarmers;
     public int2 MapSize;
+    public UnityEngine.GameObject PlantPrefab;
+    
+    [UnityEngine.Tooltip("How long it takes (in seconds) for the plant to completely finish growing.")]
+    public float PlantIncubationTime;
 }
 
 class GameConfigBaker : Baker<GameConfigAuthoring>
@@ -18,7 +21,8 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             FarmerPrefab = GetEntity(authoring.FarmerPrefab),
             PlantPrefab = GetEntity(authoring.PlantPrefab),
             InitialFarmerCount = authoring.InitialFarmers,
-            MapSize = authoring.MapSize
+            MapSize = authoring.MapSize,
+            PlantIncubationTime = authoring.PlantIncubationTime,
         });
     }
 }

@@ -1,10 +1,5 @@
-using System.Resources;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Rendering;
-using Unity.Transforms;
 
 [BurstCompile]
 public partial class PlantGrowingSystem : SystemBase
@@ -17,19 +12,13 @@ public partial class PlantGrowingSystem : SystemBase
     [BurstCompile]
     protected override void OnUpdate()
     {
+        var growthRate = 1f / SystemAPI.GetSingleton<GameConfig>().PlantIncubationTime;
         var dt = Time.DeltaTime;
         Entities
             .WithAll<PlantHealth>()
-            .ForEach((Entity entity, PlantGrowingAspect health) =>
+            .ForEach((PlantGrowingAspect health) =>
             {
-                //var pos = transform.Position;
-                //pos.y = entity.Index;
-                //var angle = (0.5f + noise.cnoise(pos / 10f)) * 4.0f * math.PI;
-                //var dir = float3.zero;
-                //math.sincos(angle, out dir.x, out dir.z);
-                //transform.Position += dir * dt * 5.0f;
-                //transform.Rotation = quaternion.RotateY(angle);
-                health.Health += dt * 0.05f;
+                health.Health += dt * growthRate;
             }).ScheduleParallel();
     }
 }

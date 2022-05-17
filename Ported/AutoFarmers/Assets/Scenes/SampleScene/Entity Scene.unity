@@ -168,8 +168,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FarmerPrefab: {fileID: 8736800975837698384, guid: b78ebb996a0ec694eaac8a8ef25b22de, type: 3}
-  PlantPrefab: {fileID: 1499764401548341411, guid: 13acbcabb1a4b244bb9a4f6dca846495, type: 3}
   InitialFarmers: 10
   MapSize:
     x: 10
     y: 10
+  PlantPrefab: {fileID: 1499764401548341411, guid: 13acbcabb1a4b244bb9a4f6dca846495, type: 3}
+  PlantGrowthRate: 0.1
