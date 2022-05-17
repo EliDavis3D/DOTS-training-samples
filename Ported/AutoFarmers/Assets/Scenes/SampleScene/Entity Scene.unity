@@ -172,5 +172,7 @@ MonoBehaviour:
   MapSize:
     x: 10
     y: 10
+  GroundTileTilledPrefab: {fileID: 7802085535162115662, guid: 35389f0610890a24a9147d048020f130, type: 3}
+  GroundTileUntilledPrefab: {fileID: 1929323336127539248, guid: b5010f8b2a4baa54cabb13677849a064, type: 3}
   PlantPrefab: {fileID: 1499764401548341411, guid: 13acbcabb1a4b244bb9a4f6dca846495, type: 3}
-  PlantGrowthRate: 0.1
+  PlantIncubationTime: 3
