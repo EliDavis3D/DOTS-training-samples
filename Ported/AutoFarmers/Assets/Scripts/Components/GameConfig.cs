@@ -7,4 +7,7 @@ struct GameConfig : IComponentData
     public int InitialFarmerCount;
  
     public int2 MapSize;
+
+    public Entity PlantPrefab;
+
 }

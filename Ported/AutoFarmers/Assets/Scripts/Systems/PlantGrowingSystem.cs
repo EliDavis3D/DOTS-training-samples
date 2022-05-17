@@ -20,7 +20,7 @@ public partial class PlantGrowingSystem : SystemBase
         var dt = Time.DeltaTime;
         Entities
             .WithAll<PlantHealth>()
-            .ForEach((Entity entity, Scale scale) =>
+            .ForEach((Entity entity, PlantGrowingAspect health) =>
             {
                 //var pos = transform.Position;
                 //pos.y = entity.Index;
@@ -29,7 +29,7 @@ public partial class PlantGrowingSystem : SystemBase
                 //math.sincos(angle, out dir.x, out dir.z);
                 //transform.Position += dir * dt * 5.0f;
                 //transform.Rotation = quaternion.RotateY(angle);
-                scale.Value += dt * 0.1f;
+                health.Health += dt * 0.05f;
             }).ScheduleParallel();
     }
 }
