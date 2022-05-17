@@ -14,7 +14,7 @@ readonly partial struct PlantGrowingAspect : IAspect<PlantGrowingAspect>
         set {
             var clamped = math.clamp(value, 0, 1);
             PlantHealth.ValueRW.Health = clamped;
-            Scale.ValueRW.Value = clamped;
+            Scale.ValueRW.Value = clamped * 0.6f;
         }
     }
 }

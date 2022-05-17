@@ -33,7 +33,9 @@ public partial struct GameInitSystem : ISystem
         {
             for (int y = 0; y < size.y; y++)
             {
-                ecb.SetComponent(plants[x + (size.x * y)], new Translation { Value = new float3(x, 0, y) });
+                ecb.SetComponent(plants[x + (size.x * y)], new Translation { 
+                    Value = new float3(x, .2f, y) 
+                });
             }
         }
     }
