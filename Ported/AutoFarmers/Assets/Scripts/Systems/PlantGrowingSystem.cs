@@ -14,11 +14,12 @@ public partial class PlantGrowingSystem : SystemBase
     {
         var growthRate = 1f / SystemAPI.GetSingleton<GameConfig>().PlantIncubationTime;
         var dt = Time.DeltaTime;
+        var growth = dt * growthRate;
         Entities
             .WithAll<PlantHealth>()
             .ForEach((PlantGrowingAspect health) =>
             {
-                health.Health += dt * growthRate;
+                health.Health += growth;
             }).ScheduleParallel();
     }
 }

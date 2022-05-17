@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1576441838}
   - component: {fileID: 1576441839}
+  - component: {fileID: 1576441840}
   m_Layer: 0
   m_Name: Config
   m_TagString: Untagged
@@ -168,7 +169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FarmerPrefab: {fileID: 8736800975837698384, guid: b78ebb996a0ec694eaac8a8ef25b22de, type: 3}
-  InitialFarmers: 10
+  InitialFarmers: 1
   MapSize:
     x: 10
     y: 10
@@ -177,3 +178,17 @@ MonoBehaviour:
   PlantPrefab: {fileID: 1499764401548341411, guid: 13acbcabb1a4b244bb9a4f6dca846495, type: 3}
   PlantIncubationTime: 3
   SiloPrefab: {fileID: 3122305083443192590, guid: d81966697ea533046903c12d591e0a02, type: 3}
+--- !u!114 &1576441840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576441837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fec9214c779607e41985ffe79ca077bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InitialDroneMoney: 0
+  InitialFarmerMoney: 0

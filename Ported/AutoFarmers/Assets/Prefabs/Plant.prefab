@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1499764401548341414}
   - component: {fileID: 1499764401548341409}
   - component: {fileID: 1499764401548341408}
-  - component: {fileID: 6348606045436166625}
-  - component: {fileID: 307167030261684699}
+  - component: {fileID: -4829408441247524005}
+  - component: {fileID: 5325785921997804429}
   m_Layer: 0
   m_Name: Plant
   m_TagString: Untagged
@@ -85,7 +85,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6348606045436166625
+--- !u!114 &-4829408441247524005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499764401548341411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 725926a35d640454fa1f8042620a521a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5325785921997804429
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -98,15 +110,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InitialScale: 1
---- !u!114 &307167030261684699
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1499764401548341411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 725926a35d640454fa1f8042620a521a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
