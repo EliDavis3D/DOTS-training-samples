@@ -37,11 +37,21 @@ static class GroundUtilities
                     tileState = newState
                 };
 
+                ecb.SetComponent(groundTileEntities[index], new GroundTileView
+                {
+                    Index = index
+                    // Don't set the tilled state, otherwise the visualizer won't update it
+                });
                 ecb.SetComponent(groundTileEntities[index], new Translation
                 {
                     Value = new float3(x, 0, y)
                 });
             }
         }
+    }
+
+    public static bool StateIsTilled(GroundTileState state)
+    {
+        return state == GroundTileState.Tilled || state == GroundTileState.Planted;
     }
 }

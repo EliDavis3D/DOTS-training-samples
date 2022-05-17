@@ -37,7 +37,7 @@ public partial struct GroundVisualsSystem : ISystem
             foreach (var instance in SystemAPI.Query<GroundTileAspect>())
             {
                 GroundTileState tileState = bufferData[instance.tileView.Index].tileState;
-                bool isTilled = (tileState == GroundTileState.Tilled || tileState == GroundTileState.Planted);
+                bool isTilled = GroundUtilities.StateIsTilled(tileState);
 
                 if (isTilled != instance.tileView.Tilled)
                 {
@@ -45,14 +45,16 @@ public partial struct GroundVisualsSystem : ISystem
                     if ( isTilled )
                     {
                         meshInfo.Material = tilledMaterialId;
-                        // @TODO: Specify the tilled renderer
                     }
                     else
                     {
                         meshInfo.Material = untilledMaterialId;
-                        // @TODO: Specify the untilled renderer
                     }
                     instance.meshInfo = meshInfo;
+
+                    GroundTileView tileView = instance.tileView;
+                    tileView.Tilled = isTilled;
+                    instance.tileView = tileView;
                 }
             }
         }
