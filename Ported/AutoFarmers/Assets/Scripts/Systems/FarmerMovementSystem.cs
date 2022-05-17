@@ -17,7 +17,6 @@ public partial class FarmerMovementSystem : SystemBase
     {
     }
 
-
     [BurstCompile]
     protected override void OnUpdate()
     {

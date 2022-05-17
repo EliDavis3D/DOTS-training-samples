@@ -10,4 +10,9 @@ struct GameConfig : IComponentData
 
     public Entity GroundTileUntilledPrefab;
     public Entity GroundTileTilledPrefab;
+
+    public Entity PlantPrefab;
+    
+    public float PlantIncubationTime;
+
 }
