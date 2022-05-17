@@ -15,4 +15,6 @@ struct GameConfig : IComponentData
     
     public float PlantIncubationTime;
 
+    public Entity SiloPrefab;
+
 }

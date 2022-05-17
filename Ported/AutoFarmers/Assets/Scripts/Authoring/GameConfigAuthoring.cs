@@ -13,6 +13,8 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
     
     [UnityEngine.Tooltip("How long it takes (in seconds) for the plant to completely finish growing.")]
     public float PlantIncubationTime;
+
+    public UnityEngine.GameObject SiloPrefab;
 }
 
 class GameConfigBaker : Baker<GameConfigAuthoring>
@@ -30,6 +32,8 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             GroundTileUntilledPrefab = GetEntity(authoring.GroundTileUntilledPrefab),
 
             PlantIncubationTime = authoring.PlantIncubationTime,
+
+            SiloPrefab= GetEntity(authoring.SiloPrefab),
         });
     }
 }

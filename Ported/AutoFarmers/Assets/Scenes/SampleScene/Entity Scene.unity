@@ -176,3 +176,4 @@ MonoBehaviour:
   GroundTileUntilledPrefab: {fileID: 1929323336127539248, guid: b5010f8b2a4baa54cabb13677849a064, type: 3}
   PlantPrefab: {fileID: 1499764401548341411, guid: 13acbcabb1a4b244bb9a4f6dca846495, type: 3}
   PlantIncubationTime: 3
+  SiloPrefab: {fileID: 3122305083443192590, guid: d81966697ea533046903c12d591e0a02, type: 3}
