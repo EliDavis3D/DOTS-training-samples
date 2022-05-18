@@ -24,7 +24,7 @@ public partial struct GameInitSystem : ISystem
     /// </summary>
     private void DebugGeneratePlants(EntityCommandBuffer ecb, Allocator allocator, Entity plantPrefab)
     {
-        int2 size = new int2(500, 500);
+        int2 size = new int2(10,10);
 
         var plants = CollectionHelper.CreateNativeArray<Entity>(size.x * size.y, allocator);
         //var plants = new NativeArray<Entity>(size.x * size.y, allocator);

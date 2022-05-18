@@ -12,5 +12,6 @@ class FarmerBaker : Baker<FarmerAuthoring>
         AddComponent(new Farmer
         {
         });
+        AddComponent(new GridMover());
     }
 }
