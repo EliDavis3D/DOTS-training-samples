@@ -5,6 +5,9 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
 {
     public UnityEngine.GameObject FarmerPrefab;
     public int InitialFarmers;
+
+    public UnityEngine.GameObject DronePrefab;
+
     public int2 MapSize;
 
     public UnityEngine.GameObject GroundTileNormalPrefab;
@@ -17,6 +20,8 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
     public float PlantIncubationTime;
 
     public UnityEngine.GameObject SiloPrefab;
+
+    public int WorldGenerationSeed;
 
     public UnityEngine.GameObject RockPrefab;
     public int InitialRockAttempts;
@@ -34,8 +39,11 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
         AddComponent(new GameConfig
         {
             FarmerPrefab = GetEntity(authoring.FarmerPrefab),
-            PlantPrefab = GetEntity(authoring.PlantPrefab),
             InitialFarmerCount = authoring.InitialFarmers,
+
+            DronePrefab = GetEntity(authoring.DronePrefab),
+
+            PlantPrefab = GetEntity(authoring.PlantPrefab),
             MapSize = authoring.MapSize,
 
             GroundTileNormalPrefab = GetEntity(authoring.GroundTileNormalPrefab),
@@ -46,6 +54,8 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
 
             SiloPrefab = GetEntity(authoring.SiloPrefab),
 
+            WorldGenerationSeed = authoring.WorldGenerationSeed,
+
             RockPrefab = GetEntity(authoring.RockPrefab),
             InitialRockAttempts = authoring.InitialRockAttempts,
             MinRockSize = authoring.MinRockSize,
@@ -53,6 +63,6 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             RockHealthPerUnitArea = authoring.RockHealthPerUnitArea,
             MinRockDepth = authoring.MinRockDepth,
             MaxRockDepth = authoring.MaxRockDepth,
-        });
+        }); ;
     }
 }

@@ -170,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FarmerPrefab: {fileID: 8736800975837698384, guid: b78ebb996a0ec694eaac8a8ef25b22de, type: 3}
   InitialFarmers: 1
+  DronePrefab: {fileID: 1134412492924128211, guid: 1425d3680ab2cf84eaaebce043d03adb, type: 3}
   MapSize:
     x: 40
     y: 40

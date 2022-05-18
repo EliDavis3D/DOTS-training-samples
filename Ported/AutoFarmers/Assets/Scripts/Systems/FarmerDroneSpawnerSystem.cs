@@ -24,9 +24,12 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
         var moneyEntity = SystemAPI.GetSingletonEntity<FarmMoney>();
         var money = SystemAPI.GetSingletonRW<FarmMoney>();
         money.FarmerMoney += 1;
+        money.DroneMoney += 1;
         var gameConfig = SystemAPI.GetSingleton<GameConfig>();
 
         int farmersToSpawn = (money.FarmerMoney / 100) - money.SpawnedFarmers;
+        int dronesToSpawn = (money.DroneMoney / 100) - money.SpawnedDrones;
+
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
@@ -38,6 +41,24 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
                 Value = new float3(money.FarmerMoney / 10, 0, 0),
             });
             money.SpawnedFarmers += 1;
+        }
+
+        for (int i = 0; i < dronesToSpawn; i++)
+        {
+            var drone = ecb.Instantiate(gameConfig.DronePrefab);
+            ecb.AddComponent(drone, new Translation()
+            {
+                Value = new float3(money.DroneMoney / 10, 0, 0),
+            });
+
+            ecb.AddComponent(drone, new Mover()
+            {
+                DesiredLocation= new int2(10, 10),
+                YOffset=2,
+                Speed=2,
+            });
+
+            money.SpawnedDrones += 1;
         }
 
         ecb.SetComponent(moneyEntity, money);

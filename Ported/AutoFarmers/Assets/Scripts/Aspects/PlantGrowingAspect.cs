@@ -17,4 +17,9 @@ readonly partial struct PlantGrowingAspect : IAspect<PlantGrowingAspect>
             Scale.ValueRW.Value = clamped * 0.6f;
         }
     }
+
+    public bool GrowingComplete
+    {
+        get => PlantHealth.ValueRO.Health == 1f;
+    }
 }

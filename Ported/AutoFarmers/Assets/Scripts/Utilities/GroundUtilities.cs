@@ -19,7 +19,7 @@ static class GroundUtilities
         DynamicBuffer<GroundTile> groundData = ecb.AddBuffer<GroundTile>(groundEntity);
         groundData.Length = mapSize.x * mapSize.y;
 
-        Random randomGenerator = new Random(124536789);
+        Random randomGenerator = new Random((uint)config.WorldGenerationSeed);
         for (int y = 0; y < mapSize.y; ++y)
         {
             for (int x = 0; x < mapSize.x; ++x)
