@@ -23,5 +23,11 @@ readonly partial struct DroneGettingPlantAspect : IAspect<DroneGettingPlantAspec
     public Entity Plant
     {
         get => DroneAquirePlantIntent.ValueRO.Plant;
+        set => DroneAquirePlantIntent.ValueRW.Plant = value;
+    }
+
+    public bool HasPlant
+    {
+        get => DroneAquirePlantIntent.ValueRO.Plant != Entity.Null;
     }
 }

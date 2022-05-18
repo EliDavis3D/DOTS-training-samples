@@ -15,5 +15,6 @@ class PlantBaker : Baker<PlantAuthoring>
         {
             Health = 0
         });
+        
     }
 }
