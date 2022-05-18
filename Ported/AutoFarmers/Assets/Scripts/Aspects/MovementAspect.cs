@@ -27,6 +27,12 @@ readonly partial struct MovementAspect : IAspect<MovementAspect>
         get => new float3(Mover.ValueRO.DesiredLocation.x, YOffset, Mover.ValueRO.DesiredLocation.y);
     }
 
+    public bool AtDesiredLocation
+    {
+        get {
+            return math.distancesq(DesiredWorldLocation, Position) < 0.01f;
+        }
+    }
 
     public float Speed
     {
