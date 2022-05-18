@@ -13,6 +13,9 @@ class FarmerBaker : Baker<FarmerAuthoring>
         AddComponent(new Farmer
         {
         });
+
+        AddComponent(new GridMover());
+
         AddComponent(new Mover
         {
             Speed = authoring.Speed,
@@ -24,5 +27,6 @@ class FarmerBaker : Baker<FarmerAuthoring>
             elapsed = 0,
             random = new Random((uint)UnityEngine.Random.Range(0, uint.MaxValue))
         }); ;
+
     }
 }
