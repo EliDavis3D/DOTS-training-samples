@@ -21,6 +21,8 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
 
     public UnityEngine.GameObject SiloPrefab;
 
+    public int WorldGenerationSeed;
+
     public UnityEngine.GameObject RockPrefab;
     public int InitialRockAttempts;
     public float MinRockSize;
@@ -39,7 +41,7 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             FarmerPrefab = GetEntity(authoring.FarmerPrefab),
             InitialFarmerCount = authoring.InitialFarmers,
 
-            DronePrefab= GetEntity(authoring.DronePrefab),
+            DronePrefab = GetEntity(authoring.DronePrefab),
 
             PlantPrefab = GetEntity(authoring.PlantPrefab),
             MapSize = authoring.MapSize,
@@ -52,6 +54,8 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
 
             SiloPrefab = GetEntity(authoring.SiloPrefab),
 
+            WorldGenerationSeed = authoring.WorldGenerationSeed,
+
             RockPrefab = GetEntity(authoring.RockPrefab),
             InitialRockAttempts = authoring.InitialRockAttempts,
             MinRockSize = authoring.MinRockSize,
@@ -59,6 +63,6 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             RockHealthPerUnitArea = authoring.RockHealthPerUnitArea,
             MinRockDepth = authoring.MinRockDepth,
             MaxRockDepth = authoring.MaxRockDepth,
-        });
+        }); ;
     }
 }

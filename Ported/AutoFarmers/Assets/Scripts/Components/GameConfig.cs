@@ -19,6 +19,8 @@ struct GameConfig : IComponentData
 
     public Entity SiloPrefab;
 
+    public int WorldGenerationSeed;
+
     public Entity RockPrefab;
     public int InitialRockAttempts;
     public float MinRockSize;
