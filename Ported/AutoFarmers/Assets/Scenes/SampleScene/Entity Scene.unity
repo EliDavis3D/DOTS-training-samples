@@ -188,6 +188,10 @@ MonoBehaviour:
   RockHealthPerUnitArea: 15
   MinRockDepth: 0.4
   MaxRockDepth: 0.8
+  RockSmashAgroRange: 20
+  RockSmashActionRange: 1
+  RockDamagePerHit: 1
+  FarmerAttackCooldown: 0.25
 --- !u!114 &1576441840
 MonoBehaviour:
   m_ObjectHideFlags: 0

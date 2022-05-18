@@ -30,6 +30,12 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
     public int RockHealthPerUnitArea;
     public float MinRockDepth;
     public float MaxRockDepth;
+
+    public int RockSmashAgroRange;
+    public int RockSmashActionRange;
+    public float RockDamagePerHit;
+
+    public float FarmerAttackCooldown;
 }
 
 class GameConfigBaker : Baker<GameConfigAuthoring>
@@ -63,6 +69,12 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             RockHealthPerUnitArea = authoring.RockHealthPerUnitArea,
             MinRockDepth = authoring.MinRockDepth,
             MaxRockDepth = authoring.MaxRockDepth,
-        }); ;
+
+            RockSmashAgroRange = authoring.RockSmashAgroRange,
+            RockSmashActionRange = authoring.RockSmashActionRange,
+            RockDamagePerHit = authoring.RockDamagePerHit,
+
+            FarmerAttackCooldown = authoring.FarmerAttackCooldown,
+        });
     }
 }

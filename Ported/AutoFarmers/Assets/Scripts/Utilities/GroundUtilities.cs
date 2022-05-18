@@ -19,7 +19,6 @@ static class GroundUtilities
         DynamicBuffer<GroundTile> groundData = ecb.AddBuffer<GroundTile>(groundEntity);
         groundData.Length = mapSize.x * mapSize.y;
 
-        Random randomGenerator = new Random((uint)config.WorldGenerationSeed);
         for (int y = 0; y < mapSize.y; ++y)
         {
             for (int x = 0; x < mapSize.x; ++x)
@@ -27,10 +26,6 @@ static class GroundUtilities
                 int index = mapSize.x * y + x;
 
                 GroundTileState newState = GroundTileState.Open;
-                if (randomGenerator.NextInt(4) == 0)
-                {
-                    newState = GroundTileState.Tilled;
-                }
 
                 groundData[index] = new GroundTile
                 {
@@ -49,7 +44,8 @@ static class GroundUtilities
             }
         }
 
-        for(int i=0; i<config.InitialRockAttempts; ++i)
+        Random randomGenerator = new Random((uint)config.WorldGenerationSeed);
+        for (int i=0; i<config.InitialRockAttempts; ++i)
         {
             TryGenerateRock(ecb, config, ref groundData, ref randomGenerator);
         }
