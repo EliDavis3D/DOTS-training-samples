@@ -14,7 +14,8 @@ class DroneBaker : Baker<DroneAuthoring>
         });
         AddComponent(new Mover
         {
-            Speed = authoring.Speed
+            Speed = authoring.Speed,
+            YOffset = 2,
         });
     }
 }

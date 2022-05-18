@@ -15,7 +15,8 @@ class FarmerBaker : Baker<FarmerAuthoring>
         });
         AddComponent(new Mover
         {
-            Speed = authoring.Speed
+            Speed = authoring.Speed,
+            YOffset=1
         });
     }
 }
