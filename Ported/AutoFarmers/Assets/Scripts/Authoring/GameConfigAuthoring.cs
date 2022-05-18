@@ -7,14 +7,24 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
     public int InitialFarmers;
     public int2 MapSize;
 
+    public UnityEngine.GameObject GroundTileNormalPrefab;
     public UnityEngine.GameObject GroundTileTilledPrefab;
-    public UnityEngine.GameObject GroundTileUntilledPrefab;
+    public UnityEngine.GameObject GroundTileUnpassablePrefab;
+    
     public UnityEngine.GameObject PlantPrefab;
     
     [UnityEngine.Tooltip("How long it takes (in seconds) for the plant to completely finish growing.")]
     public float PlantIncubationTime;
 
     public UnityEngine.GameObject SiloPrefab;
+
+    public UnityEngine.GameObject RockPrefab;
+    public int InitialRockAttempts;
+    public float MinRockSize;
+    public float MaxRockSize;
+    public int RockHealthPerUnitArea;
+    public float MinRockDepth;
+    public float MaxRockDepth;
 }
 
 class GameConfigBaker : Baker<GameConfigAuthoring>
@@ -28,12 +38,21 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             InitialFarmerCount = authoring.InitialFarmers,
             MapSize = authoring.MapSize,
 
+            GroundTileNormalPrefab = GetEntity(authoring.GroundTileNormalPrefab),
             GroundTileTilledPrefab = GetEntity(authoring.GroundTileTilledPrefab),
-            GroundTileUntilledPrefab = GetEntity(authoring.GroundTileUntilledPrefab),
+            GroundTileUnpassablePrefab = GetEntity(authoring.GroundTileUnpassablePrefab),
 
             PlantIncubationTime = authoring.PlantIncubationTime,
 
-            SiloPrefab= GetEntity(authoring.SiloPrefab),
+            SiloPrefab = GetEntity(authoring.SiloPrefab),
+
+            RockPrefab = GetEntity(authoring.RockPrefab),
+            InitialRockAttempts = authoring.InitialRockAttempts,
+            MinRockSize = authoring.MinRockSize,
+            MaxRockSize = authoring.MaxRockSize,
+            RockHealthPerUnitArea = authoring.RockHealthPerUnitArea,
+            MinRockDepth = authoring.MinRockDepth,
+            MaxRockDepth = authoring.MaxRockDepth,
         });
     }
 }

@@ -8,8 +8,9 @@ struct GameConfig : IComponentData
  
     public int2 MapSize;
 
-    public Entity GroundTileUntilledPrefab;
+    public Entity GroundTileNormalPrefab;
     public Entity GroundTileTilledPrefab;
+    public Entity GroundTileUnpassablePrefab;
 
     public Entity PlantPrefab;
     
@@ -17,4 +18,11 @@ struct GameConfig : IComponentData
 
     public Entity SiloPrefab;
 
+    public Entity RockPrefab;
+    public int InitialRockAttempts;
+    public float MinRockSize;
+    public float MaxRockSize;
+    public int RockHealthPerUnitArea;
+    public float MinRockDepth;
+    public float MaxRockDepth;
 }

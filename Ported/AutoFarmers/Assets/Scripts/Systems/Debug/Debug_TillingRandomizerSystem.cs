@@ -1,6 +1,6 @@
-using System;
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
 
 [BurstCompile]
 public partial struct Debug_TillingRandomizerSystem : ISystem
@@ -19,9 +19,6 @@ public partial struct Debug_TillingRandomizerSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-
         var config = SystemAPI.GetSingleton<GameConfig>();
 
         BufferFromEntity<GroundTile> groundData = state.GetBufferFromEntity<GroundTile>(false);
@@ -29,14 +26,14 @@ public partial struct Debug_TillingRandomizerSystem : ISystem
 
         if (groundData.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> bufferData))
         {
-            Random randomGenerator = new Random((int)(state.Time.ElapsedTime * 100));
-            int val = randomGenerator.Next(20);
+            Random randomGenerator = new Random((uint)math.abs(state.Time.ElapsedTime * 100));
+            int val = randomGenerator.NextInt(20);
             if (val == 0)
             {
-                int index = randomGenerator.Next(config.MapSize.x * config.MapSize.y);
+                int index = randomGenerator.NextInt(config.MapSize.x * config.MapSize.y);
                 bufferData[index] = new GroundTile
                 {
-                    tileState = (GroundTileState)randomGenerator.Next(4)
+                    tileState = (GroundTileState)randomGenerator.NextInt(4)
                 };
             }
         }

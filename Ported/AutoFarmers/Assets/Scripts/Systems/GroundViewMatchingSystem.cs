@@ -4,8 +4,9 @@ using Unity.Entities;
 using Unity.Rendering;
 
 [BurstCompile]
-public partial struct GroundVisualsSystem : ISystem
+public partial struct GroundViewMatchingSystem : ISystem
 {
+
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<Ground>();
@@ -23,37 +24,43 @@ public partial struct GroundVisualsSystem : ISystem
 
         var config = SystemAPI.GetSingleton<GameConfig>();
 
-        Entity untilledPrefab = config.GroundTileUntilledPrefab;
-        int untilledMaterialId = state.EntityManager.GetComponentData<MaterialMeshInfo>(untilledPrefab).Material;
+        Entity normalPrefab = config.GroundTileNormalPrefab;
+        int normalMaterialId = state.EntityManager.GetComponentData<MaterialMeshInfo>(normalPrefab).Material;
 
         Entity tilledPrefab = config.GroundTileTilledPrefab;
         int tilledMaterialId = state.EntityManager.GetComponentData<MaterialMeshInfo>(tilledPrefab).Material;
 
-        BufferFromEntity<GroundTile> groundData = state.GetBufferFromEntity<GroundTile>(true);
+        Entity unpassablePrefab = config.GroundTileUnpassablePrefab;
+        int unpassableMaterialId = state.EntityManager.GetComponentData<MaterialMeshInfo>(unpassablePrefab).Material;
+
         Entity groundEntity = SystemAPI.GetSingletonEntity<Ground>();
 
-        if( groundData.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> bufferData) )
+        BufferFromEntity<GroundTile> groundDataLookup = state.GetBufferFromEntity<GroundTile>(true);
+        if (groundDataLookup.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> bufferData) )
         {
             foreach (var instance in SystemAPI.Query<GroundTileAspect>())
             {
                 GroundTileState tileState = bufferData[instance.tileView.Index].tileState;
-                bool isTilled = GroundUtilities.StateIsTilled(tileState);
 
-                if (isTilled != instance.tileView.Tilled)
+                if (tileState != instance.tileView.ViewState)
                 {
                     MaterialMeshInfo meshInfo = instance.meshInfo;
-                    if ( isTilled )
+                    if (GroundUtilities.IsTileTilled(tileState))
                     {
                         meshInfo.Material = tilledMaterialId;
                     }
+                    else if (!GroundUtilities.IsTilePassable(tileState))
+                    {
+                        meshInfo.Material = unpassableMaterialId;
+                    }
                     else
                     {
-                        meshInfo.Material = untilledMaterialId;
+                        meshInfo.Material = normalMaterialId;
                     }
                     instance.meshInfo = meshInfo;
 
                     GroundTileView tileView = instance.tileView;
-                    tileView.Tilled = isTilled;
+                    tileView.ViewState = tileState;
                     instance.tileView = tileView;
                 }
             }

@@ -171,13 +171,21 @@ MonoBehaviour:
   FarmerPrefab: {fileID: 8736800975837698384, guid: b78ebb996a0ec694eaac8a8ef25b22de, type: 3}
   InitialFarmers: 1
   MapSize:
-    x: 10
-    y: 10
+    x: 40
+    y: 40
+  GroundTileNormalPrefab: {fileID: 1929323336127539248, guid: b5010f8b2a4baa54cabb13677849a064, type: 3}
   GroundTileTilledPrefab: {fileID: 7802085535162115662, guid: 35389f0610890a24a9147d048020f130, type: 3}
-  GroundTileUntilledPrefab: {fileID: 1929323336127539248, guid: b5010f8b2a4baa54cabb13677849a064, type: 3}
+  GroundTileUnpassablePrefab: {fileID: 1929323336127539248, guid: 62569570ec39fd24fa055d8801d0adb4, type: 3}
   PlantPrefab: {fileID: 1499764401548341411, guid: 13acbcabb1a4b244bb9a4f6dca846495, type: 3}
   PlantIncubationTime: 3
   SiloPrefab: {fileID: 3122305083443192590, guid: d81966697ea533046903c12d591e0a02, type: 3}
+  RockPrefab: {fileID: 3404715115181107597, guid: 0e288ab556dd4ae4b8d51e8d612374cf, type: 3}
+  InitialRockAttempts: 2000
+  MinRockSize: 1
+  MaxRockSize: 5
+  RockHealthPerUnitArea: 15
+  MinRockDepth: 0.4
+  MaxRockDepth: 0.8
 --- !u!114 &1576441840
 MonoBehaviour:
   m_ObjectHideFlags: 0

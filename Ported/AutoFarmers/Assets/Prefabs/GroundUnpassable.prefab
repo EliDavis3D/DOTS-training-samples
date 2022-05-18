@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2826117212970207}
   - component: {fileID: 7913398735716259129}
   m_Layer: 0
-  m_Name: GroundUntilled
+  m_Name: GroundUnpassable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7bcff8821d63ba14ba3c6c7a1a1507e1, type: 2}
+  - {fileID: 2100000, guid: 60bc6f4ac3b9f5d4dae92ca416620718, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
