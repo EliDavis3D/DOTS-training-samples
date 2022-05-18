@@ -8,12 +8,12 @@ public partial class FarmerIntentSystem : SystemBase
     [BurstCompile]
     protected override void OnUpdate()
     {
-        var ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-
         const float TimeInIntentMax = 5.0f;
-        float dt = Time.DeltaTime;
 
+        var ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSystem.CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+
+        float dt = Time.DeltaTime;
         Entities.WithAll<Farmer>().ForEach((Entity entity, int entityInQueryIndex, ref FarmerIntent intent) =>
         {
             // Debug code: Stay in a state for x seconds, then swap to a new one.
