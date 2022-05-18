@@ -18,10 +18,11 @@ class FarmerBaker : Baker<FarmerAuthoring>
             Speed = authoring.Speed,
             YOffset=1
         });
-        AddComponent(new FarmerIntent 
+        AddComponent(new FarmerIntent
         {
-            value = FarmerIntentState.None, 
-            random = new Random((uint)UnityEngine.Random.Range(0, uint.MaxValue)) 
-        });
+            value = FarmerIntentState.None,
+            elapsed = 0,
+            random = new Random((uint)UnityEngine.Random.Range(0, uint.MaxValue))
+        }); ;
     }
 }
