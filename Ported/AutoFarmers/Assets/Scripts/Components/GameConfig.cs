@@ -3,8 +3,9 @@ using Unity.Mathematics;
 struct GameConfig : IComponentData
 {
     public Entity FarmerPrefab;
-
     public int InitialFarmerCount;
+
+    public Entity DronePrefab;
  
     public int2 MapSize;
 
@@ -17,6 +18,8 @@ struct GameConfig : IComponentData
     public float PlantIncubationTime;
 
     public Entity SiloPrefab;
+
+    public int WorldGenerationSeed;
 
     public Entity RockPrefab;
     public int InitialRockAttempts;

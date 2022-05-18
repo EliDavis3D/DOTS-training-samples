@@ -170,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FarmerPrefab: {fileID: 8736800975837698384, guid: b78ebb996a0ec694eaac8a8ef25b22de, type: 3}
   InitialFarmers: 1
+  DronePrefab: {fileID: 1134412492924128211, guid: 1425d3680ab2cf84eaaebce043d03adb, type: 3}
   MapSize:
     x: 40
     y: 40
@@ -179,6 +180,7 @@ MonoBehaviour:
   PlantPrefab: {fileID: 1499764401548341411, guid: 13acbcabb1a4b244bb9a4f6dca846495, type: 3}
   PlantIncubationTime: 3
   SiloPrefab: {fileID: 3122305083443192590, guid: d81966697ea533046903c12d591e0a02, type: 3}
+  WorldGenerationSeed: 10
   RockPrefab: {fileID: 3404715115181107597, guid: 0e288ab556dd4ae4b8d51e8d612374cf, type: 3}
   InitialRockAttempts: 2000
   MinRockSize: 1
@@ -198,5 +200,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fec9214c779607e41985ffe79ca077bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialDroneMoney: 0
+  InitialDroneMoney: 100
   InitialFarmerMoney: 0

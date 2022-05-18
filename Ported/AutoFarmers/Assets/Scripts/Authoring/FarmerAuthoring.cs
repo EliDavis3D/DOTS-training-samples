@@ -3,6 +3,7 @@ using Unity.Mathematics;
 
 class FarmerAuthoring : UnityEngine.MonoBehaviour
 {
+    public float Speed;
 }
 
 class FarmerBaker : Baker<FarmerAuthoring>
@@ -12,6 +13,20 @@ class FarmerBaker : Baker<FarmerAuthoring>
         AddComponent(new Farmer
         {
         });
+
         AddComponent(new GridMover());
+
+        AddComponent(new Mover
+        {
+            Speed = authoring.Speed,
+            YOffset=1
+        });
+        AddComponent(new FarmerIntent
+        {
+            value = FarmerIntentState.None,
+            elapsed = 0,
+            random = new Random((uint)UnityEngine.Random.Range(0, uint.MaxValue))
+        }); ;
+
     }
 }
