@@ -7,7 +7,7 @@ using Unity.Rendering;
 using Unity.Transforms;
 
 [BurstCompile]
-public partial struct MovementSystem : ISystem
+public partial struct FollowSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
@@ -20,11 +20,10 @@ public partial struct MovementSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        var dt = state.Time.DeltaTime;
-        foreach (var mover in SystemAPI.Query<MovementAspect>())
+        var transform = state.GetComponentDataFromEntity<LocalToWorld>();
+        foreach (var follower in SystemAPI.Query<FollowAspect>())
         {
-            var dir = mover.DesiredWorldLocation - mover.Position;
-            mover.Position += math.normalize(dir) * dt * mover.Speed;
+            follower.Position = transform.GetRefRO(follower.ThingToFollow).ValueRO.Position + follower.Offset;
         }
     }
 }
