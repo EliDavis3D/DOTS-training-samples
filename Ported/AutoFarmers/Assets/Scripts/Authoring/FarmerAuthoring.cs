@@ -3,6 +3,7 @@ using Unity.Mathematics;
 
 class FarmerAuthoring : UnityEngine.MonoBehaviour
 {
+    public float Speed;
 }
 
 class FarmerBaker : Baker<FarmerAuthoring>
@@ -11,6 +12,10 @@ class FarmerBaker : Baker<FarmerAuthoring>
     {
         AddComponent(new Farmer
         {
+        });
+        AddComponent(new Mover
+        {
+            Speed = authoring.Speed
         });
     }
 }

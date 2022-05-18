@@ -5,6 +5,9 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
 {
     public UnityEngine.GameObject FarmerPrefab;
     public int InitialFarmers;
+
+    public UnityEngine.GameObject DronePrefab;
+
     public int2 MapSize;
 
     public UnityEngine.GameObject GroundTileNormalPrefab;
@@ -34,8 +37,11 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
         AddComponent(new GameConfig
         {
             FarmerPrefab = GetEntity(authoring.FarmerPrefab),
-            PlantPrefab = GetEntity(authoring.PlantPrefab),
             InitialFarmerCount = authoring.InitialFarmers,
+
+            DronePrefab= GetEntity(authoring.DronePrefab),
+
+            PlantPrefab = GetEntity(authoring.PlantPrefab),
             MapSize = authoring.MapSize,
 
             GroundTileNormalPrefab = GetEntity(authoring.GroundTileNormalPrefab),
