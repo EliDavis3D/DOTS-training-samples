@@ -1,18 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Unity.Entities;
 
-public class DroneAquirePlantIntent : MonoBehaviour
+public struct DroneAquirePlantIntent : IComponentData
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public Entity Plant;
 }

@@ -23,8 +23,8 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
     {
         var moneyEntity = SystemAPI.GetSingletonEntity<FarmMoney>();
         var money = SystemAPI.GetSingletonRW<FarmMoney>();
-        money.FarmerMoney += 1;
-        money.DroneMoney += 1;
+        //money.FarmerMoney += 1;
+        //money.DroneMoney += 1;
         var gameConfig = SystemAPI.GetSingleton<GameConfig>();
 
         int farmersToSpawn = (money.FarmerMoney / 100) - money.SpawnedFarmers;
@@ -48,25 +48,25 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
             var plant = ecb.Instantiate(gameConfig.PlantPrefab);
             ecb.AddComponent(plant, new Translation()
             {
-                Value = new float3(money.DroneMoney / 10, 0, -10),
+                Value = new float3(money.SpawnedDrones, 0, -10),
             });
 
             var drone = ecb.Instantiate(gameConfig.DronePrefab);
             ecb.AddComponent(drone, new Translation()
             {
-                Value = new float3(money.DroneMoney / 10, 0, 0),
+                Value = new float3(money.SpawnedDrones, 0, 0),
             });
 
-            ecb.AddComponent(drone, new Drone
+            ecb.AddComponent(drone, new DroneAquirePlantIntent
             {
                 Plant = plant,
             });
 
             ecb.AddComponent(drone, new Mover()
             {
-                DesiredLocation= new int2(money.DroneMoney / 10, -10),
-                YOffset=2,
-                Speed=2,
+                DesiredLocation = new int2(money.SpawnedDrones, -10),
+                YOffset = 2,
+                Speed = 2,
             });
 
             money.SpawnedDrones += 1;

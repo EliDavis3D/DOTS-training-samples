@@ -19,7 +19,6 @@ public partial struct DroneSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        var dt = state.Time.DeltaTime;
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
         foreach (var drone in SystemAPI.Query<DroneGettingPlantAspect>())
@@ -32,6 +31,11 @@ public partial struct DroneSystem : ISystem
                     Offset = new float3(0, 1, 0)
                 });
                 drone.DesiredLocation = new int2(0, 0);
+                ecb.RemoveComponent(drone.Self, typeof(DroneAquirePlantIntent));
+                ecb.AddComponent(drone.Self, new DroneDepositPlantIntent
+                {
+                    Plant=drone.Plant
+                });
             }
         }
     }
