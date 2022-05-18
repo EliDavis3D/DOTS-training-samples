@@ -1,10 +1,6 @@
-using System.Resources;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Rendering;
-using Unity.Transforms;
 
 public partial struct DroneDepositingPlantSystem : ISystem
 {
@@ -30,6 +26,7 @@ public partial struct DroneDepositingPlantSystem : ISystem
                 ecb.DestroyEntity(drone.Plant);
                 drone.DesiredLocation = new int2(0, -1);
                 ecb.RemoveComponent(drone.Self, typeof(DroneDepositPlantIntent));
+                ecb.AddComponent(drone.Self, typeof(DroneAquirePlantIntent));
                 plantsDepositted++;
             }
         }
@@ -40,7 +37,7 @@ public partial struct DroneDepositingPlantSystem : ISystem
             var money = SystemAPI.GetSingletonRW<FarmMoney>();
 
             money.FarmerMoney += 100 * plantsDepositted;
-            money.DroneMoney += 300 * plantsDepositted;
+            money.DroneMoney += 100 * plantsDepositted;
             ecb.SetComponent(moneyEntity, money);
         }
         

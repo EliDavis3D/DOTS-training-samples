@@ -30,7 +30,7 @@ readonly partial struct MovementAspect : IAspect<MovementAspect>
     public bool AtDesiredLocation
     {
         get {
-            return math.distancesq(DesiredWorldLocation, Position) < 0.01f;
+            return math.distancesq(DesiredWorldLocation, Position) < 0.06f;
         }
     }
 

@@ -4,6 +4,8 @@ using Unity.Mathematics;
 
 readonly partial struct PlantGrowingAspect : IAspect<PlantGrowingAspect>
 {
+    public readonly Entity Self;
+
     private readonly RefRW<PlantHealth> PlantHealth;
 
     private readonly RefRW<Scale> Scale;

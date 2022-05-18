@@ -9,8 +9,11 @@ using Unity.Transforms;
 [BurstCompile]
 public partial struct FollowSystem : ISystem
 {
+    ComponentDataFromEntity<LocalToWorld> localToWorldFromEntity;
+
     public void OnCreate(ref SystemState state)
     {
+        localToWorldFromEntity = state.GetComponentDataFromEntity<LocalToWorld>(true);
     }
 
     public void OnDestroy(ref SystemState state)
@@ -20,10 +23,11 @@ public partial struct FollowSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        var transform = state.GetComponentDataFromEntity<LocalToWorld>();
+        
+        localToWorldFromEntity.Update(ref state);
         foreach (var follower in SystemAPI.Query<FollowAspect>())
         {
-            follower.Position = transform.GetRefRO(follower.ThingToFollow).ValueRO.Position + follower.Offset;
+            follower.Position = localToWorldFromEntity.GetRefRO(follower.ThingToFollow).ValueRO.Position + follower.Offset;
         }
     }
 }
