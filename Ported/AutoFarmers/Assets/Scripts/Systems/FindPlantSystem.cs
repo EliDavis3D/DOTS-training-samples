@@ -90,6 +90,7 @@ namespace Assets.Scripts.Systems.Drone
                     );
                         
                     ecb.RemoveComponent<DroneFindPlantIntent>(drone.Self);
+                    ecb.RemoveComponent<PlantGrown>(closestPlant);
                     plantWritter.TryAdd(closestPlant, true);
                 }
             }
