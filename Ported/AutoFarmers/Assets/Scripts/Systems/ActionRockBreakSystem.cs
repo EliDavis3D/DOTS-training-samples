@@ -34,109 +34,118 @@ public partial struct ActionRockBreakSystem : ISystem
         BufferFromEntity<GroundTile> groundData = state.GetBufferFromEntity<GroundTile>(false);
         Entity groundEntity = SystemAPI.GetSingletonEntity<Ground>();
 
-        if (groundData.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> bufferData))
+        if (!groundData.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> groundBufferData))
         {
-            foreach (FarmerRockBreakingAspect instance in SystemAPI.Query<FarmerRockBreakingAspect>())
+            return;
+        }
+
+        foreach (FarmerRockBreakingAspect instance in SystemAPI.Query<FarmerRockBreakingAspect>())
+        {
+            FarmerIntentState intentState = instance.intent.value;
+            if (intentState != FarmerIntentState.SmashRocks) { continue; }
+
+            ProcessFarmerInstance(instance, ref groundBufferData, config, ref state, ref ecb, rockEntityCount);
+        }
+    }
+
+
+    void ProcessFarmerInstance(in FarmerRockBreakingAspect instance, ref DynamicBuffer<GroundTile> groundBufferData, in GameConfig config, ref SystemState state, ref EntityCommandBuffer ecb, in int rockEntityCount)
+    {
+        bool needsDestination = instance.pathfindingIntent.destinationType == PathfindingDestination.None;
+        bool hasTarget = instance.combat.combatTarget != Entity.Null;
+
+        if (hasTarget)
+        {
+            if (!state.EntityManager.Exists(instance.combat.combatTarget))
             {
-                FarmerIntentState intentState = instance.intent.value;
-                if (intentState != FarmerIntentState.SmashRocks) { continue; }
-
-                bool needsDestination = instance.pathfindingIntent.destinationType == PathfindingDestination.None;
-                bool hasTarget = instance.combat.combatTarget != Entity.Null;
-
-                if (hasTarget)
+                ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
+            }
+            else
+            {
+                float newCooldownTicker = instance.combat.cooldownTicker - state.Time.DeltaTime;
+                if (newCooldownTicker <= 0)
                 {
-                    if (!state.EntityManager.Exists(instance.combat.combatTarget))
+                    if (TryBreakRock(instance.combat.combatTarget, config.RockDamagePerHit, ref state, ref ecb))
                     {
+                        GroundUtilities.DestroyRock(instance.combat.combatTarget, state.EntityManager, ecb, config, ref groundBufferData);
+
+                        instance.combat = new FarmerCombat
+                        {
+                            combatTarget = Entity.Null,
+                            cooldownTicker = 0.0f
+                        };
                         ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
                     }
                     else
                     {
-                        float newCooldownTicker = instance.combat.cooldownTicker - state.Time.DeltaTime;
-                        if (newCooldownTicker <= 0)
+                        instance.combat = new FarmerCombat
                         {
-                            if (TryBreakRock(instance.combat.combatTarget, config.RockDamagePerHit, ref state, ref ecb))
-                            {
-                                GroundUtilities.DestroyRock(instance.combat.combatTarget, state.EntityManager, ecb, config, ref bufferData);
-
-                                instance.combat = new FarmerCombat
-                                {
-                                    combatTarget = Entity.Null,
-                                    cooldownTicker = 0.0f
-                                };
-                                ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
-                            }
-                            else
-                            {
-                                instance.combat = new FarmerCombat
-                                {
-                                    combatTarget = instance.combat.combatTarget,
-                                    cooldownTicker = config.FarmerAttackCooldown
-                                };
-                            }
-                        }
-                        else
-                        {
-                            instance.combat = new FarmerCombat
-                            {
-                                cooldownTicker = newCooldownTicker
-                            };
-                        }
-                    }
-                }
-                else if (needsDestination)
-                {
-                    if (rockEntityCount > 0)
-                    {
-                        ecb.SetComponent(instance.Self, new PathfindingIntent
-                        {
-                            navigatorType = NavigatorType.Farmer,
-                            destinationType = PathfindingDestination.Rock,
-                            RequiredZone = GroundUtilities.GetFullMapBounds(config)
-                        });
-                    }
-                    else
-                    {
-                        ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
-                    }
-                }
-                else if (IsInRangeOfPathfindingDestination(instance.translation, instance.PathfindingWaypoints, config.RockSmashActionRange, config.MapSize.x))
-                {
-                    if(instance.PathfindingWaypoints.Length > 0)
-                    {
-                        Waypoint destination = instance.PathfindingWaypoints.ElementAt(0);
-                        Entity rockEntity = bufferData[destination.TileIndex].rockEntityByTile;
-                        if(rockEntity != Entity.Null)
-                        {
-                            instance.combat = new FarmerCombat
-                            {
-                                combatTarget = rockEntity,
-                                cooldownTicker = 0.0f
-                            };
-                        }
-                        else
-                        {
-                            ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
-                        }
-                    }
-                    else
-                    {
-                        ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
+                            combatTarget = instance.combat.combatTarget,
+                            cooldownTicker = config.FarmerAttackCooldown
+                        };
                     }
                 }
                 else
                 {
-                    // Wait
-
                     instance.combat = new FarmerCombat
                     {
-                        combatTarget = instance.combat.combatTarget,
-                        cooldownTicker = instance.combat.cooldownTicker
+                        cooldownTicker = newCooldownTicker
                     };
                 }
             }
         }
+        else if (needsDestination)
+        {
+            if (rockEntityCount > 0)
+            {
+                ecb.SetComponent(instance.Self, new PathfindingIntent
+                {
+                    navigatorType = NavigatorType.Farmer,
+                    destinationType = PathfindingDestination.Rock,
+                    RequiredZone = GroundUtilities.GetFullMapBounds(config)
+                });
+            }
+            else
+            {
+                ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
+            }
+        }
+        else if (IsInRangeOfPathfindingDestination(instance.translation, instance.PathfindingWaypoints, config.RockSmashActionRange, config.MapSize.x))
+        {
+            if (instance.PathfindingWaypoints.Length > 0)
+            {
+                Waypoint destination = instance.PathfindingWaypoints.ElementAt(0);
+                Entity rockEntity = groundBufferData[destination.TileIndex].rockEntityByTile;
+                if (rockEntity != Entity.Null)
+                {
+                    instance.combat = new FarmerCombat
+                    {
+                        combatTarget = rockEntity,
+                        cooldownTicker = 0.0f
+                    };
+                }
+                else
+                {
+                    ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
+                }
+            }
+            else
+            {
+                ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
+            }
+        }
+        else
+        {
+            // Wait
+
+            instance.combat = new FarmerCombat
+            {
+                combatTarget = instance.combat.combatTarget,
+                cooldownTicker = instance.combat.cooldownTicker
+            };
+        }
     }
+
     bool IsInRangeOfPathfindingDestination(in Translation translation, in DynamicBuffer<Waypoint> waypoints, in float rockBreakDist, in int mapWidth)
     {
         if (waypoints.Length == 0) return true;
