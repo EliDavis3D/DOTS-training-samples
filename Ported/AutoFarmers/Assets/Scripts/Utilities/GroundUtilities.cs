@@ -207,5 +207,10 @@ static class GroundUtilities
             }
         }
     }
+
+    public static UnityEngine.RectInt GetFullMapBounds(in GameConfig gameConfig)
+    {
+        return new UnityEngine.RectInt(0, 0, gameConfig.MapSize.x, gameConfig.MapSize.y);
+    }
     #endregion
 }

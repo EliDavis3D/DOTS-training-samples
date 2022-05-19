@@ -24,8 +24,12 @@ class FarmerBaker : Baker<FarmerAuthoring>
             value = FarmerIntentState.None,
             elapsed = 0,
             random = new Random((uint)UnityEngine.Random.Range(0, uint.MaxValue))
-        }); ;
+        });
+        AddComponent(new PathfindingIntent
+        {
+            destinationType = PathfindingDestination.None,
+            navigatorType = NavigatorType.Farmer
+        });
         AddComponent(new FarmerCombat { });
-        AddComponent(new Targeting { });
     }
 }

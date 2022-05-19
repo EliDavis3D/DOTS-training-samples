@@ -37,30 +37,47 @@ public partial struct ActionRockBreakSystem : ISystem
 
         if (groundData.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> bufferData))
         {
-            foreach (FarmerTargetingAspect instance in SystemAPI.Query<FarmerTargetingAspect>())
+            foreach (FarmerRockBreakingAspect instance in SystemAPI.Query<FarmerRockBreakingAspect>())
             {
                 FarmerIntentState intentState = instance.intent.value;
                 if (intentState != FarmerIntentState.SmashRocks) { continue; }
 
-                if (instance.targeting.entityTarget == Entity.Null)
+                if (instance.pathfindingIntent.destinationType == PathfindingDestination.None && instance.combat.combatTarget == Entity.Null)
                 {
                     if (rockEntities.Length > 0 &&
-                        TryAquireTarget(instance.translation, rockEntities, ref randomGenerator, config.RockSmashAgroRange, ref state, out Targeting targeting))
+                        instance.pathfindingIntent.destinationType == PathfindingDestination.None/* &&
+                        TryAquireTarget(instance.translation, rockEntities, ref randomGenerator, config.PathfindingAcquisitionRange, ref state, out Targeting targeting, out int2 targetTile)*/)
                     {
-                        instance.targeting = targeting;
+                        instance.pathfindingIntent = new PathfindingIntent
+                        {
+                            navigatorType = NavigatorType.Farmer,
+                            destinationType = PathfindingDestination.Rock,
+                            RequiredZone = GroundUtilities.GetFullMapBounds(config)
+                        };
                     }
                     else
                     {
                         instance.intent = CreateEmptyIntent(instance.intent.random);
                     }
                 }
-                else if (!state.EntityManager.Exists(instance.targeting.entityTarget))
+                /*else if(instance.combat.combatTarget == Entity.Null && JustGotInRangeOfDestination)
                 {
-                    instance.targeting = CreateEmptyTarget();
-                    instance.intent = CreateEmptyIntent(instance.intent.random);
+                    instance.combat.combatTarget = ConvertFinalWaypointToRockEntityId;
                 }
+                else if(HasCombatTarget)
+                {
+                    ActuallyAttackRock
+                }*/
+
+
+                /*else if (!state.EntityManager.Exists(instance.targeting.entityTarget))
+                //{
+                    //instance.targeting = CreateEmptyTarget();
+                    //instance.intent = CreateEmptyIntent(instance.intent.random);
+                //}
                 else if (IsAtTarget(instance.translation, instance.targeting, config.RockSmashActionRange, ref state))
                 {
+                    // @TODO: If close enough, convert final waypoint to rockEntity
                     float newCooldownTicker = instance.combat.cooldownTicker - state.Time.DeltaTime;
                     if (newCooldownTicker <= 0)
                     {
@@ -84,14 +101,14 @@ public partial struct ActionRockBreakSystem : ISystem
                             cooldownTicker = newCooldownTicker
                         };
                     }
-                }
+                }*/
             }
         }
 
         rockEntities.Dispose();
     }
 
-    bool TryAquireTarget(in Translation farmerTranslation, in NativeArray<Entity> rockEntities, ref Random randomGenerator, in float rockAgroDist, ref SystemState state, out Targeting targeting)
+    /*bool TryAquireTarget(in Translation farmerTranslation, in NativeArray<Entity> rockEntities, ref Random randomGenerator, in float rockAgroDist, ref SystemState state, out Targeting targeting, out int2 targetTile)
     {
         int index = randomGenerator.NextInt(0, rockEntities.Length);
 
@@ -107,23 +124,23 @@ public partial struct ActionRockBreakSystem : ISystem
             targeting = new Targeting
             {
                 entityTarget = Entity.Null,
-                tileTarget = int2.zero
             };
+            targetTile = int2.zero;
             return false;
         }
 
         // @TODO: build path for travel, and actually verify the rock is reachable
 
-        int2 targetTile = (int2)math.floor(contactPoint);
+        targetTile = (int2)math.floor(contactPoint);
         targeting = new Targeting
         {
             entityTarget = rockEntity,
-            tileTarget = targetTile
+            //tileTarget = targetTile
         };
         return true;
-    }
+    }*/
 
-    bool IsAtTarget(in Translation translation, in Targeting targeting, in float rockBreakDist, ref SystemState state)
+    /*bool IsAtTarget(in Translation translation, in Targeting targeting, in float rockBreakDist, ref SystemState state)
     {
         Translation targetTranslation = state.EntityManager.GetComponentData<Translation>(targeting.entityTarget);
         Rock rock = state.EntityManager.GetComponentData<Rock>(targeting.entityTarget);
@@ -132,9 +149,9 @@ public partial struct ActionRockBreakSystem : ISystem
         float rockDistanceSquared = math.distancesq(contactPoint, translation.Value.xz);
 
         return rockDistanceSquared < rockBreakDist * rockBreakDist;
-    }
+    }*/
 
-    bool TryBreakRock(in Targeting targeting, in float damagePerHit, ref SystemState state, ref EntityCommandBuffer ecb)
+    /*bool TryBreakRock(in Targeting targeting, in float damagePerHit, ref SystemState state, ref EntityCommandBuffer ecb)
     {
         RockHealth rockHealth = state.EntityManager.GetComponentData<RockHealth>(targeting.entityTarget);
         float newHealth = rockHealth.Value - damagePerHit;
@@ -146,7 +163,7 @@ public partial struct ActionRockBreakSystem : ISystem
         });
 
         return didBreak;
-    }
+    }*/
 
     float2 CalcRockClosestPoint(in Translation translation, in Translation rockTranslation, in Rock rock)
     {
@@ -167,12 +184,12 @@ public partial struct ActionRockBreakSystem : ISystem
             elapsed = 0
         };
     }
-    static Targeting CreateEmptyTarget()
+    /*static Targeting CreateEmptyTarget()
     {
         return new Targeting
         {
             entityTarget = Entity.Null,
             tileTarget = int2.zero
         };
-    }
+    }*/
 }

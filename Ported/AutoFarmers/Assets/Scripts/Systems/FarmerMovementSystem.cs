@@ -5,7 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
-
+/*
 [BurstCompile]
 public partial class FarmerMovementSystem : SystemBase
 {
@@ -61,3 +61,4 @@ public partial class FarmerMovementSystem : SystemBase
             }).ScheduleParallel();
     }
 }
+*/
