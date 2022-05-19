@@ -29,13 +29,6 @@ public partial class FarmerMovementSystem : SystemBase
             .WithAll<Farmer>()
             .ForEach((Entity entity, TransformAspect transform, Targeting targeting) =>
             {
-                // var pos = transform.Position;
-                // pos.y = entity.Index;
-                // var angle = (0.5f + noise.cnoise(pos / 10f)) * 4.0f * math.PI;
-                // var dir = float3.zero;
-                // math.sincos(angle, out dir.x, out dir.z);
-                // transform.Position += dir * dt * 5.0f;
-                // transform.Rotation = quaternion.RotateY(angle);
                 if( targeting.entityTarget == Entity.Null )
                 {
                     // DEBUG: with no target keep moving arounnd randomly - remove when all movement is sorted
