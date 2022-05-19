@@ -54,10 +54,8 @@ public partial struct GameInitSystem : ISystem
         GroundUtilities.GenerateGroundAndRocks(ecb, config, allocator);
 
         // Initial Farmer
-        /*var farmers = CollectionHelper.CreateNativeArray<Entity>(config.InitialFarmerCount, allocator);
-        ecb.Instantiate(config.FarmerPrefab, farmers);*/
 
-        DebugGeneratePlants(ecb, allocator, config.PlantPrefab);
+        //DebugGeneratePlants(ecb, allocator, config.PlantPrefab);
 
         // This system should only run once at startup. So it disables itself after one update.
         // @TODO: Nic - should we also flag some component as "game ready" so systems relying on game setup know not to run?

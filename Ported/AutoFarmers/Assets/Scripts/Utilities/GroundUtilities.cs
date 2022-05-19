@@ -19,18 +19,38 @@ static class GroundUtilities
         DynamicBuffer<GroundTile> groundData = ecb.AddBuffer<GroundTile>(groundEntity);
         groundData.Length = mapSize.x * mapSize.y;
 
+        Random randomGenerator = new Random((uint)config.WorldGenerationSeed);
         for (int y = 0; y < mapSize.y; ++y)
         {
             for (int x = 0; x < mapSize.x; ++x)
             {
                 int index = mapSize.x * y + x;
 
-                groundData[index] = new GroundTile
+                if(randomGenerator.NextFloat(0, 1) < 0.05)
                 {
-                    tileState = GroundTileState.Open,
-                    rockEntityByTile = Entity.Null,
-                    plantEntityByTile = Entity.Null
-                };
+                    var plant = ecb.Instantiate(config.PlantPrefab);
+                    ecb.SetComponent<Translation>(plant, new Translation
+                    {
+                        Value = new float3(x, .2f, y),
+                    });
+                    groundData[index] = new GroundTile
+                    {
+                        tileState = GroundTileState.Planted,
+                        rockEntityByTile = Entity.Null,
+                        plantEntityByTile = plant
+                    };
+
+                } else
+                {
+                    groundData[index] = new GroundTile
+                    {
+                        tileState = GroundTileState.Open,
+                        rockEntityByTile = Entity.Null,
+                        plantEntityByTile = Entity.Null
+                    };
+                }
+
+               
 
                 ecb.SetComponent(groundTileEntities[index], new GroundTileView
                 {
@@ -43,7 +63,6 @@ static class GroundUtilities
             }
         }
 
-        Random randomGenerator = new Random((uint)config.WorldGenerationSeed);
         for (int i=0; i<config.InitialRockAttempts; ++i)
         {
             TryGenerateRock(ecb, config, ref groundData, ref randomGenerator);
