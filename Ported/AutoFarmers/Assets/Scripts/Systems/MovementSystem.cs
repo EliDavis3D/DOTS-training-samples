@@ -23,8 +23,14 @@ public partial struct MovementSystem : ISystem
         var dt = state.Time.DeltaTime;
         foreach (var mover in SystemAPI.Query<MovementAspect>())
         {
-            var dir = mover.DesiredWorldLocation - mover.Position;
-            mover.Position += math.normalize(dir) * dt * mover.Speed;
+            if (mover.HasDestination)
+            {
+                var dir = mover.DesiredWorldLocation - mover.Position;
+                if (!mover.AtDesiredLocation)
+                {
+                    mover.Position += math.normalize(dir) * dt * mover.Speed;
+                }
+            }
         }
     }
 }

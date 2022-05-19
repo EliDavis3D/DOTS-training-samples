@@ -13,9 +13,7 @@ class FarmerBaker : Baker<FarmerAuthoring>
         AddComponent(new Farmer
         {
         });
-
-        AddComponent(new GridMover());
-
+        
         AddComponent(new Mover
         {
             Speed = authoring.Speed,

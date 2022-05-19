@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 
-public class PathingAspect : MonoBehaviour
+readonly partial struct PathingAspect : IAspect<PathingAspect>
 {
+    public readonly DynamicBuffer<Waypoint> Waypoints;
+    public readonly MovementAspect Movement;
 }

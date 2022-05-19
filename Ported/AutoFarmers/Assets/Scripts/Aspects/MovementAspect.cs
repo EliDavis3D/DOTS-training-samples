@@ -6,7 +6,7 @@ readonly partial struct MovementAspect : IAspect<MovementAspect>
 {
     public readonly Entity Self;
 
-    private readonly TransformAspect Transform;
+    public readonly TransformAspect Transform;
 
     private readonly RefRW<Mover> Mover;
 
@@ -16,6 +16,12 @@ readonly partial struct MovementAspect : IAspect<MovementAspect>
         set => Transform.Position = value;
     }
 
+    public bool HasDestination
+    {
+        get => Mover.ValueRO.HasDestination;
+        set => Mover.ValueRW.HasDestination = value;
+    }
+    
     public int2 DesiredLocation
     {
         get => Mover.ValueRO.DesiredLocation;

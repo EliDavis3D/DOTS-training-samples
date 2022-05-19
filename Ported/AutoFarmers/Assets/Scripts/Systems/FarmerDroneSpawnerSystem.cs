@@ -65,6 +65,7 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
 
             ecb.AddComponent(drone, new Mover()
             {
+                HasDestination = true,
                 DesiredLocation = new int2(money.SpawnedDrones, -10),
                 YOffset = 2,
                 Speed = 2,

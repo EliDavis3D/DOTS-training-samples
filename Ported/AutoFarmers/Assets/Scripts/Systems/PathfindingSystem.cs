@@ -6,7 +6,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-public enum SearchTask
+public enum PathfindingDestination
 {
     Silo,
     UntilledGround,
@@ -14,7 +14,7 @@ public enum SearchTask
     Plant,
 }
 
-public enum NavigableType
+public enum NavigatorType
 {
     Farmer,
     Drone,
@@ -28,7 +28,7 @@ partial struct PathfindingSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<Ground>();
-        
+        state.RequireForUpdate<GameConfig>();
     }
 
     public void OnDestroy(ref SystemState state)
@@ -46,39 +46,36 @@ partial struct PathfindingSystem : ISystem
         // Get game config to get map size
         var gameConfig = SystemAPI.GetSingleton<GameConfig>();
         
-        // Get ecb
-        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+        // Allocator for native arrays to use in job
+        var allocator = state.WorldUnmanaged.UpdateAllocator.ToAllocator;
+
+        // Dylan TODO: logic for determining which enums to pass in (ie. What kind of Navigator (drone or farmer), and What is the destination)
+        NavigatorType navigatorType = NavigatorType.Farmer;
+        PathfindingDestination destinationType = PathfindingDestination.Plant; 
         
         // Get ground tiles buffer from ground singleton
         BufferFromEntity<GroundTile> groundData = state.GetBufferFromEntity<GroundTile>(true);
         Entity groundEntity = SystemAPI.GetSingletonEntity<Ground>();
-        
-        // temp
-        //BufferFromEntity<Waypoint> waypointBufferFromEntity = state.GetBufferFromEntity<Waypoint>(true);
                 
-        var allocator = state.WorldUnmanaged.UpdateAllocator.ToAllocator;
-        
         if (groundData.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> groundBuffer))
         {
             // Initialize the job
             var findPathJob = new FindPath
             {
-                // temp
-                //waypointBufferFromEntity = waypointBufferFromEntity,
+                NavigatorType = navigatorType,
+                DestinationType = destinationType,
+
                 VisitedTiles = CollectionHelper.CreateNativeArray<int>(gameConfig.MapSize.x * gameConfig.MapSize.y, allocator),
                 ActiveTiles = new NativeList<int>(allocator),
                 NextTiles = new NativeList<int>(allocator),
                 OutputTiles = new NativeList<int>(allocator),
                 
-                DirsX = new int4(-1, 1, 0, 0),
-                DirsY = new int4(0, 0, -1, 1),
+                DirsX = new int4(0, 0, 1, -1),
+                DirsY = new int4(1, -1, 0, 0),
                 Ground = groundBuffer,
                 MapSize = gameConfig.MapSize,
                 Range = 2,
                 RequiredZone = new RectInt(0, 0, gameConfig.MapSize.x, gameConfig.MapSize.y),
-            
-                ECB = ecb,
             };
             
             // Schedule execution in a single thread, and do not block main thread.
@@ -90,17 +87,14 @@ partial struct PathfindingSystem : ISystem
     }
 }
 
-[BurstCompile]
+//[BurstCompile]
 partial struct FindPath : IJobEntity
 {
-    // temp
-    //public BufferFromEntity<Waypoint> waypointBufferFromEntity;
-    
     public int4 DirsX;
     public int4 DirsY;
 
-    public NavigableType Navigator;
-    public SearchTask Task;
+    public NavigatorType NavigatorType;
+    public PathfindingDestination DestinationType;
     public DynamicBuffer<GroundTile> Ground;
     public int2 MapSize;
     public int Range;
@@ -110,16 +104,16 @@ partial struct FindPath : IJobEntity
     public NativeList<int> ActiveTiles;
     public NativeList<int> NextTiles;
     public NativeList<int> OutputTiles;
-    
-    public EntityCommandBuffer ECB;
 
     void Execute(ref PathfindingAspect pathfinder)
     {
-        int startX = pathfinder.CurrentCoordinates.x;
-        int startY = pathfinder.CurrentCoordinates.y;
-        
         int mapWidth = MapSize.x;
         int mapHeight = MapSize.y;
+        
+        if (!GroundUtilities.TryGetTileCoords(pathfinder.Translation.ValueRO, mapWidth, mapHeight, out int2 start))
+        {
+            return;
+        }
         
         for (int x=0;x<mapWidth;x++) {
             for (int y = 0; y < mapHeight; y++) {
@@ -127,10 +121,10 @@ partial struct FindPath : IJobEntity
             }
         }
         OutputTiles.Clear();
-        VisitedTiles[Hash(startX,startY)] = 0;
+        VisitedTiles[Hash(start.x, start.y)] = 0;
         ActiveTiles.Clear();
         NextTiles.Clear();
-        NextTiles.Add(Hash(startX,startY));
+        NextTiles.Add(Hash(start.x, start.y));
         
         int steps = 0;
         
@@ -156,30 +150,26 @@ partial struct FindPath : IJobEntity
                         continue;
                     }
 
-                    int hashedX2Y2 = Hash(x2, y2);
-                    if (VisitedTiles[hashedX2Y2]==-1 || VisitedTiles[hashedX2Y2]>steps) {
+                    int hash = Hash(x2, y2);
+                    if (VisitedTiles[hash]==-1 || VisitedTiles[hash]>steps) {
                         
-                        int hash = Hash(x2,y2);
-                        if (GetNavigable(Navigator, x2, y2)) {
-                            VisitedTiles[hashedX2Y2] = steps;
+                        if (GetNavigable(NavigatorType, hash, Ground)) {
+                            VisitedTiles[hash] = steps;
                             NextTiles.Add(hash);
                         }
                         if (x2 >= RequiredZone.xMin && x2 <= RequiredZone.xMax) {
                             if (y2 >= RequiredZone.yMin && y2 <= RequiredZone.yMax) {
-                                if (CheckMatchingTile(Task, x2, y2)) {
-                                    OutputTiles.Add(hash);
+                                if (CheckMatchingTile(DestinationType, hash, Ground))
+                                {
+                                    AssignPathTo(OutputTiles, x2, y2, DirsX, DirsY, MapSize.x, MapSize.y, VisitedTiles);
                                     
+                                    // Recreate waypoints with the calculated path
                                     pathfinder.ClearWaypoints();
-                                    
-                                    // Add the waypoints in the calculated path
-                                    foreach (int indexInOutputTile in OutputTiles)
+                                    for (int outputIndex = OutputTiles.Length - 1; outputIndex >= 0; outputIndex--)
                                     {
-                                        //temp
-                                        //waypointBufferFromEntity[pathfinder.Self].Add(new Waypoint());
-                                        
                                         pathfinder.AddWaypoint(new Waypoint()
                                         {
-                                            TileIndex = indexInOutputTile
+                                            TileIndex = OutputTiles[outputIndex]
                                         });
                                     }
 
@@ -192,15 +182,67 @@ partial struct FindPath : IJobEntity
             }
         }
     }
+    
+    public void AssignPathTo(NativeList<int> pathTo,int endX, int endY, int4 dirsX, int4 dirsY,
+        int mapWidth, int mapHeight, NativeArray<int> visitedTiles) {
+        pathTo.Clear();
 
-    private bool CheckMatchingTile(SearchTask searchTask, int x, int y)
-    {
-        return true;
+        int x = endX;
+        int y = endY;
+
+        pathTo.Add(Hash(x, y));
+
+        int dist = int.MaxValue;
+        while (dist>0) {
+            int minNeighborDist = int.MaxValue;
+            int bestNewX = x;
+            int bestNewY = y;
+            for (int i=0;i<4;i++) {
+                int x2 = x + dirsX[i];
+                int y2 = y + dirsY[i];
+                if (x2 < 0 || y2 < 0 || x2 >= mapWidth || y2 >= mapHeight) {
+                    continue;
+                }
+
+                int newDist = visitedTiles[Hash(x2, y2)];
+                if (newDist !=-1 && newDist < minNeighborDist) {
+                    minNeighborDist = newDist;
+                    bestNewX = x2;
+                    bestNewY = y2;
+                }
+            }
+            x = bestNewX;
+            y = bestNewY;
+            dist = minNeighborDist;
+            
+            pathTo.Add(Hash(x, y));
+        }
     }
 
-    private bool GetNavigable(NavigableType navigator, int x, int y)
+    private bool CheckMatchingTile(PathfindingDestination pathfindingDestination, int tileIndex, DynamicBuffer<GroundTile> groundTiles)
     {
-        return true;
+        switch (pathfindingDestination)
+        {
+            case PathfindingDestination.Plant:
+                return groundTiles[tileIndex].tileState == GroundTileState.Planted;
+            case PathfindingDestination.Rock:
+                return groundTiles[tileIndex].tileState == GroundTileState.Unpassable;
+            case PathfindingDestination.UntilledGround:
+                return groundTiles[tileIndex].tileState == GroundTileState.Open;
+            default:
+                return false;
+        }
+    }
+
+    private bool GetNavigable(NavigatorType navigatorType, int tileIndex, DynamicBuffer<GroundTile> groundTiles)
+    {
+        switch (navigatorType)
+        {
+            case NavigatorType.Farmer:
+                return groundTiles[tileIndex].tileState != GroundTileState.Unpassable;
+            default:
+                return true;
+        }
     }
 
     private int Hash(int x, int y)
