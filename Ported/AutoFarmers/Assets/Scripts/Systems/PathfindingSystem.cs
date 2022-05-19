@@ -87,7 +87,7 @@ partial struct PathfindingSystem : ISystem
     }
 }
 
-//[BurstCompile]
+[BurstCompile]
 partial struct FindPath : IJobEntity
 {
     public int4 DirsX;
