@@ -170,7 +170,7 @@ partial struct FindPath : IJobEntity
                                     
                                     // Recreate waypoints with the calculated path
                                     pathfinder.ClearWaypoints();
-                                    for (int outputIndex = OutputTiles.Length - 1; outputIndex >= 0; outputIndex--)
+                                    for (int outputIndex = 0; outputIndex < OutputTiles.Length; ++outputIndex)
                                     {
                                         pathfinder.AddWaypoint(new Waypoint()
                                         {

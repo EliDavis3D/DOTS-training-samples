@@ -37,6 +37,10 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
 
     public float FarmerAttackCooldown;
     public float FarmerMoveSpeed;
+
+    public int CostToSpawnFarmer;
+    public int CostToSpawnDrone;
+    public int MoneyPerPlant;
 }
 
 class GameConfigBaker : Baker<GameConfigAuthoring>
@@ -76,7 +80,11 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             RockDamagePerHit = authoring.RockDamagePerHit,
 
             FarmerAttackCooldown = authoring.FarmerAttackCooldown,
-            FarmerMoveSpeed = authoring.FarmerMoveSpeed
+            FarmerMoveSpeed = authoring.FarmerMoveSpeed,
+
+            CostToSpawnFarmer = authoring.CostToSpawnFarmer,
+            CostToSpawnDrone = authoring.CostToSpawnDrone,
+            MoneyPerPlant = authoring.MoneyPerPlant,
         });
     }
 }

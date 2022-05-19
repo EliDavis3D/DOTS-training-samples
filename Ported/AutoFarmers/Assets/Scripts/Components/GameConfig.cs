@@ -35,4 +35,8 @@ struct GameConfig : IComponentData
 
     public float FarmerAttackCooldown;
     public float FarmerMoveSpeed;
+
+    public int CostToSpawnFarmer;
+    public int CostToSpawnDrone;
+    public int MoneyPerPlant;
 }

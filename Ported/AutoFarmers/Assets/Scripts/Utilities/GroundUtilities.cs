@@ -25,17 +25,16 @@ static class GroundUtilities
             {
                 int index = mapSize.x * y + x;
 
-                GroundTileState newState = GroundTileState.Open;
-
                 groundData[index] = new GroundTile
                 {
-                    tileState = newState
+                    tileState = GroundTileState.Open,
+                    rockEntityByTile = Entity.Null,
+                    plantEntityByTile = Entity.Null
                 };
 
                 ecb.SetComponent(groundTileEntities[index], new GroundTileView
                 {
                     Index = index
-                    // Don't set the tilled state, otherwise the visualizer won't update it
                 });
                 ecb.SetComponent(groundTileEntities[index], new Translation
                 {
@@ -56,10 +55,10 @@ static class GroundUtilities
         return xy.y * groundWidth + xy.x;
     }
 
-    public static int2 GetTileCoords(in int index, in int groundWidth, in int groundHeight)
+    public static int2 GetTileCoords(in int index, in int groundWidth)
     {
         int y = index / groundWidth;
-        int x = index % groundHeight;
+        int x = index % groundWidth;
         return new int2(x, y);
     }
 
@@ -82,9 +81,9 @@ static class GroundUtilities
         return true;
     }
 
-    public static float2 GetTileTranslation(in int tileIndex, in int groundWidth, in int groundHeight)
+    public static float2 GetTileTranslation(in int tileIndex, in int groundWidth)
     {
-        int2 coordinates = GetTileCoords(tileIndex, groundWidth, groundHeight);
+        int2 coordinates = GetTileCoords(tileIndex, groundWidth);
         
         // Assuming tiles are sized 1x1
         return new float2(coordinates.x, coordinates.y);
@@ -114,8 +113,6 @@ static class GroundUtilities
             return false;
         }
 
-        SetAllTilesInRangeTo(GroundTileState.Unpassable, ref groundData, minTile, maxTile, config.MapSize.x);
-
         float depth = randomGenerator.NextFloat(config.MinRockDepth, config.MaxRockDepth);
 
         float3 rockSize = new float3(size.x, depth, size.y);
@@ -142,6 +139,8 @@ static class GroundUtilities
             Value = health,
         });
 
+        SetAllTilesInRangeTo(GroundTileState.Unpassable, rockEntity, ref groundData, minTile, maxTile, config.MapSize.x);
+
         return true;
     }
 
@@ -159,7 +158,7 @@ static class GroundUtilities
         int2 minTile = math.clamp((int2)math.floor(rockTranslation.Value.xz - rockScale.Value.xz/2 + offset), int2.zero, config.MapSize);
         int2 maxTile = math.clamp((int2)math.floor(rockTranslation.Value.xz + rockScale.Value.xz/2 + offset), int2.zero, config.MapSize);
 
-        SetAllTilesInRangeTo(GroundTileState.Open, ref groundData, minTile, maxTile, config.MapSize.x);
+        SetAllTilesInRangeTo(GroundTileState.Open, Entity.Null, ref groundData, minTile, maxTile, config.MapSize.x);
 
         ecb.DestroyEntity(rockEntity);
     }
@@ -195,6 +194,7 @@ static class GroundUtilities
     }
 
     public static void SetAllTilesInRangeTo( GroundTileState state,
+        Entity rockEntity, // NOTE: Sent Entity.null if you are not placing a rock
         ref DynamicBuffer<GroundTile> groundData,
         in int2 minTile, in int2 maxTile, in int mapWidth)
     {
@@ -203,7 +203,11 @@ static class GroundUtilities
             for (int x = minTile.x; x <= maxTile.x; ++x)
             {
                 int index = y * mapWidth + x;
-                groundData[index] = new GroundTile { tileState = state };
+                groundData[index] = new GroundTile {
+                    tileState = state,
+                    rockEntityByTile = rockEntity,
+                    plantEntityByTile = Entity.Null
+                };
             }
         }
     }

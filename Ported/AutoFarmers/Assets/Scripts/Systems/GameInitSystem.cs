@@ -25,7 +25,7 @@ public partial struct GameInitSystem : ISystem
     /// </summary>
     private void DebugGeneratePlants(EntityCommandBuffer ecb, Allocator allocator, Entity plantPrefab)
     {
-        int2 size = new int2(250, 250);
+        int2 size = new int2(25, 25);
 
         var plants = CollectionHelper.CreateNativeArray<Entity>(size.x * size.y, allocator);
         //var plants = new NativeArray<Entity>(size.x * size.y, allocator);
@@ -54,8 +54,8 @@ public partial struct GameInitSystem : ISystem
         GroundUtilities.GenerateGroundAndRocks(ecb, config, allocator);
 
         // Initial Farmer
-        var farmers = CollectionHelper.CreateNativeArray<Entity>(config.InitialFarmerCount, allocator);
-        ecb.Instantiate(config.FarmerPrefab, farmers);
+        /*var farmers = CollectionHelper.CreateNativeArray<Entity>(config.InitialFarmerCount, allocator);
+        ecb.Instantiate(config.FarmerPrefab, farmers);*/
 
         DebugGeneratePlants(ecb, allocator, config.PlantPrefab);
 

@@ -42,7 +42,8 @@ public partial struct ActionRockBreakSystem : ISystem
                 FarmerIntentState intentState = instance.intent.value;
                 if (intentState != FarmerIntentState.SmashRocks) { continue; }
 
-                if (instance.pathfindingIntent.destinationType == PathfindingDestination.None && instance.combat.combatTarget == Entity.Null)
+                if (instance.pathfindingIntent.destinationType == PathfindingDestination.None &&
+                    instance.combat.combatTarget == Entity.Null)
                 {
                     if (rockEntities.Length > 0 &&
                         instance.pathfindingIntent.destinationType == PathfindingDestination.None/* &&
@@ -60,14 +61,71 @@ public partial struct ActionRockBreakSystem : ISystem
                         instance.intent = CreateEmptyIntent(instance.intent.random);
                     }
                 }
-                /*else if(instance.combat.combatTarget == Entity.Null && JustGotInRangeOfDestination)
+                else if (instance.combat.combatTarget == Entity.Null &&
+                         IsInRangeOfPathfindingDestination(instance.translation, instance.PathfindingWaypoints, config.RockSmashActionRange, config.MapSize.x))
                 {
-                    instance.combat.combatTarget = ConvertFinalWaypointToRockEntityId;
+                    if(instance.PathfindingWaypoints.Length > 0)
+                    {
+                        Waypoint destination = instance.PathfindingWaypoints.ElementAt(0);
+                        Entity rockEntity = bufferData[destination.TileIndex].rockEntityByTile;
+                        if(rockEntity != Entity.Null)
+                        {
+                            instance.combat = new FarmerCombat
+                            {
+                                combatTarget = rockEntity,
+                                cooldownTicker = 0.0f
+                            };
+                        }
+                        else
+                        {
+                            instance.intent = CreateEmptyIntent(instance.intent.random);
+                        }
+                    }
+                    else
+                    {
+                        instance.intent = CreateEmptyIntent(instance.intent.random);
+                    }
                 }
-                else if(HasCombatTarget)
+                if(instance.combat.combatTarget != Entity.Null)
                 {
-                    ActuallyAttackRock
-                }*/
+                    if(!state.EntityManager.Exists(instance.combat.combatTarget))
+                    {
+                        instance.intent = CreateEmptyIntent(instance.intent.random);
+                    }
+                    else
+                    {
+                        float newCooldownTicker = instance.combat.cooldownTicker - state.Time.DeltaTime;
+                        if (newCooldownTicker <= 0)
+                        {
+                            if (TryBreakRock(instance.combat.combatTarget, config.RockDamagePerHit, ref state, ref ecb))
+                            {
+                                GroundUtilities.DestroyRock(instance.combat.combatTarget, state.EntityManager, ecb, config, ref bufferData);
+
+                                instance.combat = new FarmerCombat
+                                {
+                                    combatTarget = Entity.Null,
+                                    cooldownTicker = 0.0f
+                                };
+                                instance.intent = CreateEmptyIntent(instance.intent.random);
+                            }
+                            else
+                            {
+                                instance.combat = new FarmerCombat
+                                {
+                                    combatTarget = instance.combat.combatTarget,
+                                    cooldownTicker = config.FarmerAttackCooldown
+                                };
+                            }
+                        }
+                        else
+                        {
+                            instance.combat = new FarmerCombat
+                            {
+                                cooldownTicker = newCooldownTicker
+                            };
+                        }
+                    }
+                }
 
 
                 /*else if (!state.EntityManager.Exists(instance.targeting.entityTarget))
@@ -107,7 +165,18 @@ public partial struct ActionRockBreakSystem : ISystem
 
         rockEntities.Dispose();
     }
+    bool IsInRangeOfPathfindingDestination(in Translation translation, in DynamicBuffer<Waypoint> waypoints, in float rockBreakDist, in int mapWidth)
+    {
+        if (waypoints.Length == 0) return true;
 
+        Waypoint destination = waypoints.ElementAt(0);
+
+        float2 finalWaypointTranslation = GroundUtilities.GetTileTranslation(destination.TileIndex, mapWidth);
+
+        float rockDistanceSquared = math.distancesq(finalWaypointTranslation, translation.Value.xz);
+
+        return rockDistanceSquared < rockBreakDist * rockBreakDist;
+    }
     /*bool TryAquireTarget(in Translation farmerTranslation, in NativeArray<Entity> rockEntities, ref Random randomGenerator, in float rockAgroDist, ref SystemState state, out Targeting targeting, out int2 targetTile)
     {
         int index = randomGenerator.NextInt(0, rockEntities.Length);
@@ -151,19 +220,19 @@ public partial struct ActionRockBreakSystem : ISystem
         return rockDistanceSquared < rockBreakDist * rockBreakDist;
     }*/
 
-    /*bool TryBreakRock(in Targeting targeting, in float damagePerHit, ref SystemState state, ref EntityCommandBuffer ecb)
+    bool TryBreakRock(in Entity rockEntity, in float damagePerHit, ref SystemState state, ref EntityCommandBuffer ecb)
     {
-        RockHealth rockHealth = state.EntityManager.GetComponentData<RockHealth>(targeting.entityTarget);
+        RockHealth rockHealth = state.EntityManager.GetComponentData<RockHealth>(rockEntity);
         float newHealth = rockHealth.Value - damagePerHit;
         bool didBreak = newHealth <= 0;
 
-        ecb.SetComponent(targeting.entityTarget, new RockHealth
+        ecb.SetComponent(rockEntity, new RockHealth
         {
             Value = newHealth
         });
 
         return didBreak;
-    }*/
+    }
 
     float2 CalcRockClosestPoint(in Translation translation, in Translation rockTranslation, in Rock rock)
     {

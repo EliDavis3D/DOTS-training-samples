@@ -46,7 +46,7 @@ partial struct UpdatePathJob : IJobEntity
             float2 agentTranslation = new float2(agentTranslation3.x, agentTranslation3.y);
         
             Waypoint nextWaypoint = pathingAgent.Waypoints[pathingAgent.Waypoints.Length - 1];
-            float2 nextWaypointTranslation = GroundUtilities.GetTileTranslation(nextWaypoint.TileIndex, MapWidth, MapHeight);
+            float2 nextWaypointTranslation = GroundUtilities.GetTileTranslation(nextWaypoint.TileIndex, MapWidth);
         
             if (math.distance(agentTranslation, nextWaypointTranslation) < InRangeDistance)
             {
@@ -55,7 +55,7 @@ partial struct UpdatePathJob : IJobEntity
 
             if (pathingAgent.Waypoints.Length > 0)
             {
-                pathingAgent.Movement.DesiredLocation = GroundUtilities.GetTileCoords(pathingAgent.Waypoints[pathingAgent.Waypoints.Length - 1].TileIndex, MapWidth, MapHeight);
+                pathingAgent.Movement.DesiredLocation = GroundUtilities.GetTileCoords(pathingAgent.Waypoints[pathingAgent.Waypoints.Length - 1].TileIndex, MapWidth);
                 pathingAgent.Movement.HasDestination = true;
             }
             else

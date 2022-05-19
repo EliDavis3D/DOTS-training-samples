@@ -18,6 +18,8 @@ public partial struct DroneDepositingPlantSystem : ISystem
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
+        var gameConfig = SystemAPI.GetSingleton<GameConfig>();
+
         var plantsDepositted = 0;
         foreach (var drone in SystemAPI.Query<DroneDepositingPlantAspect>())
         {
@@ -36,8 +38,8 @@ public partial struct DroneDepositingPlantSystem : ISystem
             var moneyEntity = SystemAPI.GetSingletonEntity<FarmMoney>();
             var money = SystemAPI.GetSingletonRW<FarmMoney>();
 
-            money.FarmerMoney += 100 * plantsDepositted;
-            money.DroneMoney += 100 * plantsDepositted;
+            money.FarmerMoney += gameConfig.MoneyPerPlant * plantsDepositted;
+            money.DroneMoney += gameConfig.MoneyPerPlant * plantsDepositted;
             ecb.SetComponent(moneyEntity, money);
         }
         

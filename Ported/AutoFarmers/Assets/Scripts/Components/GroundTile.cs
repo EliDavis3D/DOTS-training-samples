@@ -12,4 +12,7 @@ public enum GroundTileState : byte
 public struct GroundTile : IBufferElementData
 {
     public GroundTileState tileState;
+
+    public Entity rockEntityByTile;
+    public Entity plantEntityByTile;
 }
