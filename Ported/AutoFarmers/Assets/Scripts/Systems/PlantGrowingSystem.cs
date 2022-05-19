@@ -23,12 +23,12 @@ public partial struct PlantGrowingSystem : ISystem
         var dt = state.Time.DeltaTime;
 
         var growth = dt * growthRate;
-        foreach (var plant in SystemAPI.Query<PlantGrowingAspect>())
+        foreach (var plant in SystemAPI.Query<PlantGrowingAspect>().WithAll<PlantGrowing>())
         {
             plant.Health += growth;
             if (plant.GrowingComplete)
             {
-                ecb.RemoveComponent(plant.Self, typeof(PlantHealth));
+                ecb.RemoveComponent<PlantGrowing>(plant.Self);
                 ecb.AddComponent(plant.Self, new PlantGrown { });
             }
         }

@@ -17,13 +17,11 @@ class DroneBaker : Baker<DroneAuthoring>
             HasDestination = true,
             Speed = authoring.Speed,
             YOffset = 2,
-            DesiredLocation=new Unity.Mathematics.int2(
+            DesiredLocation = new Unity.Mathematics.int2(
                 UnityEngine.Mathf.RoundToInt(authoring.transform.position.x),
                 UnityEngine.Mathf.RoundToInt(authoring.transform.position.z)
             )
         });
-        AddComponent(new DroneAquirePlantIntent
-        {
-        });
+        AddComponent(new DroneFindPlantIntent { });
     }
 }

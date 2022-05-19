@@ -8,6 +8,7 @@ readonly partial struct DroneGettingPlantAspect : IAspect<DroneGettingPlantAspec
 
     private readonly MovementAspect Movement;
 
+
     private readonly RefRW<DroneAquirePlantIntent> DroneAquirePlantIntent;
 
     public bool AtDesiredLocation
@@ -30,4 +31,6 @@ readonly partial struct DroneGettingPlantAspect : IAspect<DroneGettingPlantAspec
     {
         get => DroneAquirePlantIntent.ValueRO.Plant != Entity.Null;
     }
+
+
 }

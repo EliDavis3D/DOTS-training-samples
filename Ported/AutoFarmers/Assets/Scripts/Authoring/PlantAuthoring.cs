@@ -15,6 +15,10 @@ class PlantBaker : Baker<PlantAuthoring>
         {
             Health = 0
         });
-        
+
+        AddComponent(new PlantGrowing
+        {
+
+        });
     }
 }

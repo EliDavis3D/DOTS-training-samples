@@ -49,7 +49,7 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
             var drone = ecb.Instantiate(gameConfig.DronePrefab);
             ecb.AddComponent(drone, new Translation()
             {
-                Value = new float3(money.SpawnedDrones, 0, 0),
+                Value = new float3(0, 0, 0),
             });
 
             money.SpawnedDrones += 1;
