@@ -6,6 +6,7 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
 
+[BurstCompile]
 public partial struct DroneAcquirePlantSystem : ISystem
 {
     EntityQuery siloQuery;
@@ -41,13 +42,15 @@ public partial struct DroneAcquirePlantSystem : ISystem
                     EntityToFollow = drone.Self,
                     Offset = new float3(0, 1, 0)
                 });
+
                 ecb.RemoveComponent<DroneAquirePlantIntent>(drone.Self);
+
                 ecb.AddComponent(drone.Self, new DroneDepositPlantIntent
                 {
                     Plant = drone.Plant
                 });
 
-                var dronePos = localToWorldFromEntity.GetRefRO(drone.Self).ValueRO.Position;
+                var dronePos = localToWorldFromEntity[drone.Self].Position;
                 var closestPlantDistance = float.MaxValue;
                 var closestPlantPos = new float3(0, 0, 0);
                 for (int i = 0; i < chunks.Length; i++)
@@ -57,7 +60,7 @@ public partial struct DroneAcquirePlantSystem : ISystem
                     for (int j = 0; j < chunk.Count; j++)
                     {
                         var silo = silos[j];
-                        var plantPos = localToWorldFromEntity.GetRefRO(silo).ValueRO.Position;
+                        var plantPos = localToWorldFromEntity[silo].Position;
                        
                         var dist = math.distancesq(plantPos, dronePos);
                         if (dist < closestPlantDistance)
