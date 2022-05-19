@@ -95,7 +95,8 @@ static class GroundUtilities
         });
         ecb.SetComponent(rockEntity, new Rock
         {
-            size = rockSize
+            size = rockSize,
+            initialHealth = health
         });
         ecb.SetComponent(rockEntity, new RockHealth
         {
@@ -115,8 +116,9 @@ static class GroundUtilities
         Translation rockTranslation = entityManager.GetComponentData<Translation>(rockEntity);
         NonUniformScale rockScale = entityManager.GetComponentData<NonUniformScale>(rockEntity);
 
-        int2 minTile = math.clamp((int2)math.floor(rockTranslation.Value.xz - rockScale.Value.xz/2), int2.zero, config.MapSize);
-        int2 maxTile = math.clamp((int2)math.floor(rockTranslation.Value.xz + rockScale.Value.xz/2), int2.zero, config.MapSize);
+        float2 offset = new float2(0.5f, 0.5f);
+        int2 minTile = math.clamp((int2)math.floor(rockTranslation.Value.xz - rockScale.Value.xz/2 + offset), int2.zero, config.MapSize);
+        int2 maxTile = math.clamp((int2)math.floor(rockTranslation.Value.xz + rockScale.Value.xz/2 + offset), int2.zero, config.MapSize);
 
         SetAllTilesInRangeTo(GroundTileState.Open, ref groundData, minTile, maxTile, config.MapSize.x);
 

@@ -35,6 +35,8 @@ public partial class FarmerIntentSystem : SystemBase
                 }
             }
 
+            if(intent.value == FarmerIntentState.SmashRocks) { return; } // Smash rocks is done now - make this == none when all states are ready
+
             intent.value = (FarmerIntentState)intent.random.NextInt(1, 5);
             ecb.SetComponent<FarmerIntent>(entityInQueryIndex, entity, intent);
 

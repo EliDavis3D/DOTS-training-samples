@@ -40,11 +40,12 @@ public partial struct ActionRockBreakSystem : ISystem
             foreach (FarmerTargetingAspect instance in SystemAPI.Query<FarmerTargetingAspect>())
             {
                 FarmerIntentState intentState = instance.intent.value;
-                if (intentState != FarmerIntentState.SmashRocks) { continue; }
+                //if (intentState != FarmerIntentState.SmashRocks) { continue; }
 
                 if (instance.targeting.entityTarget == Entity.Null)
                 {
-                    if (TryAquireTarget(instance.translation, rockEntities, ref randomGenerator, config.RockSmashAgroRange, ref state, out Targeting targeting))
+                    if (rockEntities.Length > 0 &&
+                        TryAquireTarget(instance.translation, rockEntities, ref randomGenerator, config.RockSmashAgroRange, ref state, out Targeting targeting))
                     {
                         instance.targeting = targeting;
                     }
@@ -55,6 +56,7 @@ public partial struct ActionRockBreakSystem : ISystem
                 }
                 else if (!state.EntityManager.Exists(instance.targeting.entityTarget))
                 {
+                    instance.targeting = CreateEmptyTarget();
                     instance.intent = CreateEmptyIntent(instance.intent.random);
                 }
                 else if (IsAtTarget(instance.translation, instance.targeting, config.RockSmashActionRange, ref state))
@@ -66,9 +68,12 @@ public partial struct ActionRockBreakSystem : ISystem
                         {
                             cooldownTicker = config.FarmerAttackCooldown
                         };
-                        if (TryBreakRock(instance.targeting, config.RockDamagePerHit, ref state))
+
+                        if (!TryBreakRock(instance.targeting, config.RockDamagePerHit, ref state, ref ecb))
                         {
                             GroundUtilities.DestroyRock(instance.targeting.entityTarget, state.EntityManager, ecb, config, ref bufferData);
+
+                            instance.targeting = CreateEmptyTarget();
                             instance.intent = CreateEmptyIntent(instance.intent.random);
                         }
                     }
@@ -120,8 +125,6 @@ public partial struct ActionRockBreakSystem : ISystem
 
     bool IsAtTarget(in Translation translation, in Targeting targeting, in float rockBreakDist, ref SystemState state)
     {
-        return true;
-        // @TODO: actually get movement sorted so farmers approach
         Translation targetTranslation = state.EntityManager.GetComponentData<Translation>(targeting.entityTarget);
         Rock rock = state.EntityManager.GetComponentData<Rock>(targeting.entityTarget);
 
@@ -131,11 +134,16 @@ public partial struct ActionRockBreakSystem : ISystem
         return rockDistanceSquared < rockBreakDist * rockBreakDist;
     }
 
-    bool TryBreakRock(in Targeting targeting, in float damagePerHit, ref SystemState state)
+    bool TryBreakRock(in Targeting targeting, in float damagePerHit, ref SystemState state, ref EntityCommandBuffer ecb)
     {
         RockHealth rockHealth = state.EntityManager.GetComponentData<RockHealth>(targeting.entityTarget);
         float newHealth = rockHealth.Value - damagePerHit;
         bool didBreak = newHealth <= 0;
+
+        ecb.SetComponent(targeting.entityTarget, new RockHealth
+        {
+            Value = newHealth
+        });
 
         return didBreak;
     }
@@ -157,6 +165,14 @@ public partial struct ActionRockBreakSystem : ISystem
             value = FarmerIntentState.None,
             random = random,
             elapsed = 0
+        };
+    }
+    static Targeting CreateEmptyTarget()
+    {
+        return new Targeting
+        {
+            entityTarget = Entity.Null,
+            tileTarget = int2.zero
         };
     }
 }

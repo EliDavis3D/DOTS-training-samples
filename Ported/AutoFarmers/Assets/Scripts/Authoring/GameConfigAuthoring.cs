@@ -36,6 +36,7 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
     public float RockDamagePerHit;
 
     public float FarmerAttackCooldown;
+    public float FarmerMoveSpeed;
 }
 
 class GameConfigBaker : Baker<GameConfigAuthoring>
@@ -75,6 +76,7 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             RockDamagePerHit = authoring.RockDamagePerHit,
 
             FarmerAttackCooldown = authoring.FarmerAttackCooldown,
+            FarmerMoveSpeed = authoring.FarmerMoveSpeed
         });
     }
 }

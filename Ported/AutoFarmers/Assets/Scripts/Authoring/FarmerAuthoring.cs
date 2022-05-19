@@ -28,5 +28,6 @@ class FarmerBaker : Baker<FarmerAuthoring>
             random = new Random((uint)UnityEngine.Random.Range(0, uint.MaxValue))
         }); ;
         AddComponent(new FarmerCombat { });
+        AddComponent(new Targeting { });
     }
 }

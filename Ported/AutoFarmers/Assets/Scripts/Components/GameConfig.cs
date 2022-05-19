@@ -34,4 +34,5 @@ struct GameConfig : IComponentData
     public float RockDamagePerHit;
 
     public float FarmerAttackCooldown;
+    public float FarmerMoveSpeed;
 }
