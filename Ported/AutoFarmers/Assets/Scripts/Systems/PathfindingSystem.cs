@@ -274,6 +274,5 @@ partial struct printJob : IJobEntity
         {
             sb.Append($"[{waypoint.TileIndex}] ");
         }
-        Debug.Log($"{pathfinder.Self}: {sb}");
     }
 }

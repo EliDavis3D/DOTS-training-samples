@@ -27,13 +27,13 @@ public partial struct DroneDepositingPlantSystem : ISystem
             {
                 ecb.DestroyEntity(drone.Plant);
                 drone.DesiredLocation = new int2(0, -1);
-                ecb.RemoveComponent(drone.Self, typeof(DroneDepositPlantIntent));
-                ecb.AddComponent(drone.Self, typeof(DroneAquirePlantIntent));
+                ecb.RemoveComponent<DroneDepositPlantIntent>(drone.Self);
+                ecb.AddComponent(drone.Self, new DroneFindPlantIntent { });
                 plantsDepositted++;
             }
         }
 
-        if(plantsDepositted > 0)
+        if (plantsDepositted > 0)
         {
             var moneyEntity = SystemAPI.GetSingletonEntity<FarmMoney>();
             var money = SystemAPI.GetSingletonRW<FarmMoney>();
@@ -42,6 +42,6 @@ public partial struct DroneDepositingPlantSystem : ISystem
             money.DroneMoney += gameConfig.MoneyPerPlant * plantsDepositted;
             ecb.SetComponent(moneyEntity, money);
         }
-        
+
     }
 }
