@@ -11,6 +11,7 @@ public partial struct GameInitSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<GameConfig>();
     }
 
     public void OnDestroy(ref SystemState state)

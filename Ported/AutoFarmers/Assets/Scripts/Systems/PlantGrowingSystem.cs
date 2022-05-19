@@ -4,10 +4,14 @@ using Unity.Entities;
 [BurstCompile]
 public partial struct PlantGrowingSystem : ISystem
 {
-    public void OnCreate(ref SystemState state) { }
+    public void OnCreate(ref SystemState state) 
+    {
+        state.RequireForUpdate<GameConfig>();
+    }
 
-    public void OnDestroy(ref SystemState state) { }
-
+    public void OnDestroy(ref SystemState state) 
+    {
+    }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)

@@ -11,16 +11,16 @@ public partial class FarmerMovementSystem : SystemBase
 {
     public void OnCreate(ref SystemState state)
     {
-    }
-
-    public void OnDestroy(ref SystemState state)
-    {
+        state.RequireForUpdate<GameConfig>();
     }
 
     [BurstCompile]
     protected override void OnUpdate()
     {
-        var config = SystemAPI.GetSingleton<GameConfig>();
+        GameConfig config;
+        if (!SystemAPI.TryGetSingleton<GameConfig>(out config))
+            return; // Avoids exception around GameConfig not existing yet, is RequireForUpdate<GameConfig>() not working properly? -- todo investigate.
+        //var config = SystemAPI.GetSingleton<GameConfig>();
 
         var dt = Time.DeltaTime;
         float movementSpeed = dt * config.FarmerMoveSpeed;
