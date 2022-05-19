@@ -188,11 +188,14 @@ MonoBehaviour:
   RockHealthPerUnitArea: 15
   MinRockDepth: 0.4
   MaxRockDepth: 0.8
-  RockSmashAgroRange: 20
+  PathfindingAcquisitionRange: 20
   RockSmashActionRange: 1
   RockDamagePerHit: 10
   FarmerAttackCooldown: 0.25
   FarmerMoveSpeed: 5
+  CostToSpawnFarmer: 10
+  CostToSpawnDrone: 10
+  MoneyPerPlant: 3
 --- !u!114 &1576441840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,4 +209,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InitialDroneMoney: 100
-  InitialFarmerMoney: 0
+  InitialFarmerMoney: 40
