@@ -46,12 +46,6 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
 
         for (int i = 0; i < dronesToSpawn; i++)
         {
-            var plant = ecb.Instantiate(gameConfig.PlantPrefab);
-            ecb.AddComponent(plant, new Translation()
-            {
-                Value = new float3(money.SpawnedDrones, 0, -10),
-            });
-
             var drone = ecb.Instantiate(gameConfig.DronePrefab);
             ecb.AddComponent(drone, new Translation()
             {
@@ -70,7 +64,6 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
                 YOffset = 2,
                 Speed = 2,
             });
-
             money.SpawnedDrones += 1;
         }
 

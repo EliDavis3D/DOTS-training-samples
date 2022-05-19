@@ -28,4 +28,11 @@ struct GameConfig : IComponentData
     public int RockHealthPerUnitArea;
     public float MinRockDepth;
     public float MaxRockDepth;
+
+    public int RockSmashAgroRange;
+    public int RockSmashActionRange;
+    public float RockDamagePerHit;
+
+    public float FarmerAttackCooldown;
+    public float FarmerMoveSpeed;
 }

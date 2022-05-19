@@ -19,7 +19,6 @@ static class GroundUtilities
         DynamicBuffer<GroundTile> groundData = ecb.AddBuffer<GroundTile>(groundEntity);
         groundData.Length = mapSize.x * mapSize.y;
 
-        Random randomGenerator = new Random((uint)config.WorldGenerationSeed);
         for (int y = 0; y < mapSize.y; ++y)
         {
             for (int x = 0; x < mapSize.x; ++x)
@@ -27,10 +26,6 @@ static class GroundUtilities
                 int index = mapSize.x * y + x;
 
                 GroundTileState newState = GroundTileState.Open;
-                if (randomGenerator.NextInt(4) == 0)
-                {
-                    newState = GroundTileState.Tilled;
-                }
 
                 groundData[index] = new GroundTile
                 {
@@ -49,7 +44,8 @@ static class GroundUtilities
             }
         }
 
-        for(int i=0; i<config.InitialRockAttempts; ++i)
+        Random randomGenerator = new Random((uint)config.WorldGenerationSeed);
+        for (int i=0; i<config.InitialRockAttempts; ++i)
         {
             TryGenerateRock(ecb, config, ref groundData, ref randomGenerator);
         }
@@ -138,7 +134,8 @@ static class GroundUtilities
         });
         ecb.SetComponent(rockEntity, new Rock
         {
-            size = rockSize
+            size = rockSize,
+            initialHealth = health
         });
         ecb.SetComponent(rockEntity, new RockHealth
         {
@@ -158,8 +155,9 @@ static class GroundUtilities
         Translation rockTranslation = entityManager.GetComponentData<Translation>(rockEntity);
         NonUniformScale rockScale = entityManager.GetComponentData<NonUniformScale>(rockEntity);
 
-        int2 minTile = math.clamp((int2)math.floor(rockTranslation.Value.xz - rockScale.Value.xz/2), int2.zero, config.MapSize);
-        int2 maxTile = math.clamp((int2)math.floor(rockTranslation.Value.xz + rockScale.Value.xz/2), int2.zero, config.MapSize);
+        float2 offset = new float2(0.5f, 0.5f);
+        int2 minTile = math.clamp((int2)math.floor(rockTranslation.Value.xz - rockScale.Value.xz/2 + offset), int2.zero, config.MapSize);
+        int2 maxTile = math.clamp((int2)math.floor(rockTranslation.Value.xz + rockScale.Value.xz/2 + offset), int2.zero, config.MapSize);
 
         SetAllTilesInRangeTo(GroundTileState.Open, ref groundData, minTile, maxTile, config.MapSize.x);
 
