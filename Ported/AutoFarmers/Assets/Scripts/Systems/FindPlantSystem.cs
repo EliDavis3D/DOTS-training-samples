@@ -8,6 +8,7 @@ using Unity.Transforms;
 
 namespace Assets.Scripts.Systems.Drone
 {
+    [BurstCompile]
     public partial struct FindPlantSystem : ISystem
     {
         EntityQuery grownPlantsQuery;
@@ -36,18 +37,21 @@ namespace Assets.Scripts.Systems.Drone
                 return;
             }
 
+            //var allocator = state.WorldUnmanaged.UpdateAllocator.ToAllocator;
+            //CollectionHelper.CreateNativeMultiHashMap<Entity, bool, Allocator>(100, ref allocator);
+            var claimedPlants = new NativeParallelHashMap<Entity, bool>(100, Allocator.Temp);
+            var plantWritter = claimedPlants.AsParallelWriter();
+
             localToWorldFromEntity.Update(ref state);
             plantFromEntity.Update(ref state);
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             foreach (var drone in SystemAPI.Query<DroneFindPlantAspect>().WithAll<DroneFindPlantIntent>())
             {
-                var dronePos = localToWorldFromEntity.GetRefRO(drone.Self).ValueRO.Position;
+                var dronePos = localToWorldFromEntity[drone.Self].Position;
                 var closestPlant = Entity.Null;
                 var closestPlantDistance = float.MaxValue;
                 var closestPlantPos = new float3(0, 0, 0);
-                //var chunkIndex = -1;
-                //var entryInChunkIndex = -1;
                 for (int i = 0; i < chunks.Length; i++)
                 {
                     var chunk = chunks[i];
@@ -55,9 +59,10 @@ namespace Assets.Scripts.Systems.Drone
                     for (int j = 0; j < chunk.Count; j++)
                     {
                         var plant = plants[j];
-                        var plantPos = localToWorldFromEntity.GetRefRO(plant).ValueRO.Position;
-                        var claimed = plantFromEntity.GetRefRO(plant).ValueRO.ClaimedBy;
-                        if (claimed != Entity.Null)
+                        var plantPos = localToWorldFromEntity[plant].Position;
+                        var claimed = plantFromEntity[plant].ClaimedBy;
+
+                        if (claimed != Entity.Null || claimedPlants.ContainsKey(plant)) // 
                         {
                             continue;
                         }
@@ -67,8 +72,6 @@ namespace Assets.Scripts.Systems.Drone
                             closestPlantDistance = dist;
                             closestPlant = plant;
                             closestPlantPos = plantPos;
-                            //chunkIndex = i;
-                            //entryInChunkIndex = j;
                         }
                     }
                     plants.Dispose();
@@ -77,16 +80,17 @@ namespace Assets.Scripts.Systems.Drone
                 if (closestPlant != Entity.Null)
                 {
                     ecb.SetComponent<Plant>(closestPlant, new Plant { ClaimedBy = drone.Self });
-                    ecb.AddComponent(drone.Self, new DroneAquirePlantIntent
+                    ecb.AddComponent<DroneAquirePlantIntent>(drone.Self, new DroneAquirePlantIntent
                     {
-                        Plant=closestPlant,
+                        Plant = closestPlant,
                     });
                     drone.DesiredLocation = new int2(
                         (int)math.round(closestPlantPos.x),
                         (int)math.round(closestPlantPos.z)
                     );
+                        
                     ecb.RemoveComponent<DroneFindPlantIntent>(drone.Self);
-                    //var plants = chunks[i].GetNativeArray(state.GetEntityTypeHandle());
+                    plantWritter.TryAdd(closestPlant, true);
                 }
             }
 

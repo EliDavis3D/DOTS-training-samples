@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 
+[BurstCompile]
 public partial struct DroneDepositingPlantSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
@@ -28,7 +29,7 @@ public partial struct DroneDepositingPlantSystem : ISystem
                 ecb.DestroyEntity(drone.Plant);
                 drone.DesiredLocation = new int2(0, -1);
                 ecb.RemoveComponent<DroneDepositPlantIntent>(drone.Self);
-                ecb.AddComponent(drone.Self, new DroneFindPlantIntent { });
+                ecb.AddComponent<DroneFindPlantIntent>(drone.Self);
                 plantsDepositted++;
             }
         }
