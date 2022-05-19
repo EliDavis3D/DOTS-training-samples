@@ -14,6 +14,7 @@ class DroneBaker : Baker<DroneAuthoring>
         });
         AddComponent(new Mover
         {
+            HasDestination = true,
             Speed = authoring.Speed,
             YOffset = 2,
             DesiredLocation=new Unity.Mathematics.int2(

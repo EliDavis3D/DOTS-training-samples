@@ -51,6 +51,45 @@ static class GroundUtilities
         }
     }
 
+    public static int GetTileIndex(in int2 xy, in int groundWidth)
+    {
+        return xy.y * groundWidth + xy.x;
+    }
+
+    public static int2 GetTileCoords(in int index, in int groundWidth, in int groundHeight)
+    {
+        int y = index / groundWidth;
+        int x = index % groundHeight;
+        return new int2(x, y);
+    }
+
+    public static bool TryGetTileCoords(in Translation translation, in int groundWidth, in int groundHeight, out int2 result)
+    {
+        float x = translation.Value.x;
+        float y = translation.Value.z;
+        
+        // Assuming tiles are size 1x1 units
+        
+        int gridX = (int) math.round(x);
+        int gridY = (int) math.round(y);
+
+        if (gridX > groundWidth || gridX < 0 || gridY > groundHeight || gridY < 0)
+        {
+            result = new int2();
+            return false;
+        }
+        result = new int2(gridX, gridY);
+        return true;
+    }
+
+    public static float2 GetTileTranslation(in int tileIndex, in int groundWidth, in int groundHeight)
+    {
+        int2 coordinates = GetTileCoords(tileIndex, groundWidth, groundHeight);
+        
+        // Assuming tiles are sized 1x1
+        return new float2(coordinates.x, coordinates.y);
+    }
+
     #region Rock Lifecycle Helpers
     public static bool TryGenerateRock(
         EntityCommandBuffer ecb,
