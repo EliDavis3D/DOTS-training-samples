@@ -25,5 +25,10 @@ class DroneBaker : Baker<DroneAuthoring>
         AddComponent(new DroneAquirePlantIntent
         {
         });
+        AddComponent(new PathfindingIntent
+        {
+            destinationType = PathfindingDestination.None,
+            navigatorType = NavigatorType.Drone
+        });
     }
 }

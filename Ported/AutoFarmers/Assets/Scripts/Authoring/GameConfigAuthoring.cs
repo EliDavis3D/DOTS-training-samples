@@ -31,7 +31,7 @@ class GameConfigAuthoring : UnityEngine.MonoBehaviour
     public float MinRockDepth;
     public float MaxRockDepth;
 
-    public int RockSmashAgroRange;
+    public int PathfindingAcquisitionRange;
     public int RockSmashActionRange;
     public float RockDamagePerHit;
 
@@ -71,7 +71,7 @@ class GameConfigBaker : Baker<GameConfigAuthoring>
             MinRockDepth = authoring.MinRockDepth,
             MaxRockDepth = authoring.MaxRockDepth,
 
-            RockSmashAgroRange = authoring.RockSmashAgroRange,
+            PathfindingAcquisitionRange = authoring.PathfindingAcquisitionRange,
             RockSmashActionRange = authoring.RockSmashActionRange,
             RockDamagePerHit = authoring.RockDamagePerHit,
 

@@ -29,7 +29,7 @@ struct GameConfig : IComponentData
     public float MinRockDepth;
     public float MaxRockDepth;
 
-    public int RockSmashAgroRange;
+    public int PathfindingAcquisitionRange;
     public int RockSmashActionRange;
     public float RockDamagePerHit;
 

@@ -8,6 +8,7 @@ using UnityEngine;
 
 public enum PathfindingDestination
 {
+    None=0,
     Silo,
     UntilledGround,
     Rock,
@@ -56,33 +57,31 @@ partial struct PathfindingSystem : ISystem
         // Get ground tiles buffer from ground singleton
         BufferFromEntity<GroundTile> groundData = state.GetBufferFromEntity<GroundTile>(true);
         Entity groundEntity = SystemAPI.GetSingletonEntity<Ground>();
+
+        
                 
         if (groundData.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> groundBuffer))
         {
             // Initialize the job
             var findPathJob = new FindPath
             {
-                NavigatorType = navigatorType,
-                DestinationType = destinationType,
-
                 VisitedTiles = CollectionHelper.CreateNativeArray<int>(gameConfig.MapSize.x * gameConfig.MapSize.y, allocator),
                 ActiveTiles = new NativeList<int>(allocator),
                 NextTiles = new NativeList<int>(allocator),
                 OutputTiles = new NativeList<int>(allocator),
-                
+
                 DirsX = new int4(0, 0, 1, -1),
                 DirsY = new int4(1, -1, 0, 0),
                 Ground = groundBuffer,
                 MapSize = gameConfig.MapSize,
-                Range = 2,
-                RequiredZone = new RectInt(0, 0, gameConfig.MapSize.x, gameConfig.MapSize.y),
+                Range = gameConfig.PathfindingAcquisitionRange,
             };
-            
+
             // Schedule execution in a single thread, and do not block main thread.
             findPathJob.Schedule();
 
-            var testJob = new printJob();
-            testJob.Schedule();
+            //var testJob = new printJob();
+            //testJob.Schedule();
         }
     }
 }
@@ -93,12 +92,9 @@ partial struct FindPath : IJobEntity
     public int4 DirsX;
     public int4 DirsY;
 
-    public NavigatorType NavigatorType;
-    public PathfindingDestination DestinationType;
     public DynamicBuffer<GroundTile> Ground;
     public int2 MapSize;
     public int Range;
-    public RectInt RequiredZone;
 
     public NativeArray<int> VisitedTiles;
     public NativeList<int> ActiveTiles;
@@ -107,6 +103,15 @@ partial struct FindPath : IJobEntity
 
     void Execute(ref PathfindingAspect pathfinder)
     {
+        NavigatorType navigatorType = pathfinder.PathfindingIntent.ValueRO.navigatorType;
+        PathfindingDestination destinationType = pathfinder.PathfindingIntent.ValueRO.destinationType;
+        RectInt requiredZone = pathfinder.PathfindingIntent.ValueRO.RequiredZone;
+
+        if (pathfinder.PathfindingIntent.ValueRO.destinationType == PathfindingDestination.None)
+        {
+            return;
+        }
+
         int mapWidth = MapSize.x;
         int mapHeight = MapSize.y;
         
@@ -153,13 +158,13 @@ partial struct FindPath : IJobEntity
                     int hash = Hash(x2, y2);
                     if (VisitedTiles[hash]==-1 || VisitedTiles[hash]>steps) {
                         
-                        if (GetNavigable(NavigatorType, hash, Ground)) {
+                        if (GetNavigable(navigatorType, hash, Ground, destinationType)) {
                             VisitedTiles[hash] = steps;
                             NextTiles.Add(hash);
                         }
-                        if (x2 >= RequiredZone.xMin && x2 <= RequiredZone.xMax) {
-                            if (y2 >= RequiredZone.yMin && y2 <= RequiredZone.yMax) {
-                                if (CheckMatchingTile(DestinationType, hash, Ground))
+                        if (x2 >= requiredZone.xMin && x2 <= requiredZone.xMax) {
+                            if (y2 >= requiredZone.yMin && y2 <= requiredZone.yMax) {
+                                if (CheckMatchingTile(destinationType, hash, Ground))
                                 {
                                     AssignPathTo(OutputTiles, x2, y2, DirsX, DirsY, MapSize.x, MapSize.y, VisitedTiles);
                                     
@@ -234,12 +239,12 @@ partial struct FindPath : IJobEntity
         }
     }
 
-    private bool GetNavigable(NavigatorType navigatorType, int tileIndex, DynamicBuffer<GroundTile> groundTiles)
+    private bool GetNavigable(NavigatorType navigatorType, int tileIndex, DynamicBuffer<GroundTile> groundTiles, PathfindingDestination destination)
     {
         switch (navigatorType)
         {
             case NavigatorType.Farmer:
-                return groundTiles[tileIndex].tileState != GroundTileState.Unpassable;
+                return groundTiles[tileIndex].tileState != GroundTileState.Unpassable || destination == PathfindingDestination.Rock;
             default:
                 return true;
         }

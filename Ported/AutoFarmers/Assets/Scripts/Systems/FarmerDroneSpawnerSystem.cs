@@ -51,7 +51,7 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
             {
                 Value = new float3(money.SpawnedDrones, 0, 0),
             });
-
+            ecb.AddBuffer<Waypoint>(drone);
             money.SpawnedDrones += 1;
         }
 
