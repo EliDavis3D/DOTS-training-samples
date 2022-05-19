@@ -29,8 +29,9 @@ public partial struct ActionRockBreakSystem : ISystem
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-        Random randomGenerator = new Random((uint)(state.Time.ElapsedTime * 100));
-        NativeArray<Entity> rockEntities = rockQuery.ToEntityArray(Allocator.Temp);
+        //Random randomGenerator = new Random((uint)(state.Time.ElapsedTime * 100));
+        //NativeArray<Entity> rockEntities = rockQuery.ToEntityArray(Allocator.Temp);
+        int rockEntityCount = rockQuery.CalculateEntityCount();
 
         BufferFromEntity<GroundTile> groundData = state.GetBufferFromEntity<GroundTile>(false);
         Entity groundEntity = SystemAPI.GetSingletonEntity<Ground>();
@@ -45,20 +46,18 @@ public partial struct ActionRockBreakSystem : ISystem
                 if (instance.pathfindingIntent.destinationType == PathfindingDestination.None &&
                     instance.combat.combatTarget == Entity.Null)
                 {
-                    if (rockEntities.Length > 0 &&
-                        instance.pathfindingIntent.destinationType == PathfindingDestination.None/* &&
-                        TryAquireTarget(instance.translation, rockEntities, ref randomGenerator, config.PathfindingAcquisitionRange, ref state, out Targeting targeting, out int2 targetTile)*/)
+                    if (rockEntityCount > 0)
                     {
-                        instance.pathfindingIntent = new PathfindingIntent
+                        ecb.SetComponent<PathfindingIntent>(instance.Self, new PathfindingIntent
                         {
                             navigatorType = NavigatorType.Farmer,
                             destinationType = PathfindingDestination.Rock,
                             RequiredZone = GroundUtilities.GetFullMapBounds(config)
-                        };
+                        });
                     }
                     else
                     {
-                        instance.intent = CreateEmptyIntent(instance.intent.random);
+                        ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
                     }
                 }
                 else if (instance.combat.combatTarget == Entity.Null &&
@@ -78,19 +77,19 @@ public partial struct ActionRockBreakSystem : ISystem
                         }
                         else
                         {
-                            instance.intent = CreateEmptyIntent(instance.intent.random);
+                            ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
                         }
                     }
                     else
                     {
-                        instance.intent = CreateEmptyIntent(instance.intent.random);
+                        ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
                     }
                 }
-                if(instance.combat.combatTarget != Entity.Null)
+                else if(instance.combat.combatTarget != Entity.Null)
                 {
                     if(!state.EntityManager.Exists(instance.combat.combatTarget))
                     {
-                        instance.intent = CreateEmptyIntent(instance.intent.random);
+                        ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
                     }
                     else
                     {
@@ -106,7 +105,7 @@ public partial struct ActionRockBreakSystem : ISystem
                                     combatTarget = Entity.Null,
                                     cooldownTicker = 0.0f
                                 };
-                                instance.intent = CreateEmptyIntent(instance.intent.random);
+                                ecb.SetComponent(instance.Self, CreateEmptyIntent(instance.intent.random));
                             }
                             else
                             {
@@ -126,7 +125,16 @@ public partial struct ActionRockBreakSystem : ISystem
                         }
                     }
                 }
+                else
+                {
+                    // Buh????
 
+                    instance.combat = new FarmerCombat
+                    {
+                        combatTarget = instance.combat.combatTarget,
+                        cooldownTicker = instance.combat.cooldownTicker
+                    };
+                }
 
                 /*else if (!state.EntityManager.Exists(instance.targeting.entityTarget))
                 //{
@@ -162,8 +170,6 @@ public partial struct ActionRockBreakSystem : ISystem
                 }*/
             }
         }
-
-        rockEntities.Dispose();
     }
     bool IsInRangeOfPathfindingDestination(in Translation translation, in DynamicBuffer<Waypoint> waypoints, in float rockBreakDist, in int mapWidth)
     {
@@ -177,37 +183,7 @@ public partial struct ActionRockBreakSystem : ISystem
 
         return rockDistanceSquared < rockBreakDist * rockBreakDist;
     }
-    /*bool TryAquireTarget(in Translation farmerTranslation, in NativeArray<Entity> rockEntities, ref Random randomGenerator, in float rockAgroDist, ref SystemState state, out Targeting targeting, out int2 targetTile)
-    {
-        int index = randomGenerator.NextInt(0, rockEntities.Length);
-
-        Entity rockEntity = rockEntities[index];
-        Translation rockTranslation = state.EntityManager.GetComponentData<Translation>(rockEntity);
-        Rock rock = state.EntityManager.GetComponentData<Rock>(rockEntities[index]);
-        
-        float2 contactPoint = CalcRockClosestPoint(farmerTranslation, rockTranslation, rock);
-        float rockDistanceSquared = math.distancesq(contactPoint, farmerTranslation.Value.xz);
-
-        if (rockDistanceSquared >= rockAgroDist * rockAgroDist)
-        {
-            targeting = new Targeting
-            {
-                entityTarget = Entity.Null,
-            };
-            targetTile = int2.zero;
-            return false;
-        }
-
-        // @TODO: build path for travel, and actually verify the rock is reachable
-
-        targetTile = (int2)math.floor(contactPoint);
-        targeting = new Targeting
-        {
-            entityTarget = rockEntity,
-            //tileTarget = targetTile
-        };
-        return true;
-    }*/
+    
 
     /*bool IsAtTarget(in Translation translation, in Targeting targeting, in float rockBreakDist, ref SystemState state)
     {

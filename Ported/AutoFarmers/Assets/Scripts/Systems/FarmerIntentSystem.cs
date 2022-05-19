@@ -19,13 +19,14 @@ public partial class FarmerIntentSystem : SystemBase
             // Debug code: Stay in a state for x seconds, then swap to a new one.
             // a state is denoted by color.
             // ! Please remove after dependent intent logic is in.
-            if (intent.value != FarmerIntentState.None)
+            if (intent.value == FarmerIntentState.None)
             {
+                ecb.AddComponent<ColorOverride>(entityInQueryIndex, entity, new ColorOverride { Value = new float4(1, 1, 1, 1) });
+
                 intent.elapsed += dt;
                 if(intent.elapsed >= TimeInIntentMax)
                 {
-                    // Time to pick a new intent.
-                    intent.elapsed = 0;
+                    PickNewIntent(entityInQueryIndex, entity, ref ecb, intent.random);
                 }
                 else
                 {
@@ -34,30 +35,58 @@ public partial class FarmerIntentSystem : SystemBase
                     return;
                 }
             }
-
-            if(intent.value == FarmerIntentState.SmashRocks) { return; } // Smash rocks is done now - remove this when all states are ready
-
-            intent.value = (FarmerIntentState)intent.random.NextInt(1, 5);
-            ecb.SetComponent<FarmerIntent>(entityInQueryIndex, entity, intent);
-
-            float4 overrideColor = new float4();
-            switch (intent.value)
-            {
-                case FarmerIntentState.SmashRocks:
-                    overrideColor = new float4(1, 0, 0, 1); // red
-                    break;
-                case FarmerIntentState.TillGround:
-                    overrideColor = new float4(1, 1, 1, 1); // white
-                    break;
-                case FarmerIntentState.PlantSeeds:
-                    overrideColor = new float4(0, 0.92f, 0.016f, 1); // yellow
-                    break;
-                case FarmerIntentState.SellPlants:
-                    overrideColor = new float4(1, 0, 1, 1); // magenta
-                    break;
-            }
-
-            ecb.AddComponent<ColorOverride>(entityInQueryIndex, entity, new ColorOverride { Value = overrideColor });
         }).ScheduleParallel();
+    }
+
+    static void PickNewIntent(int entityInQueryIndex, Entity entity, ref EntityCommandBuffer.ParallelWriter ecb, Random random)
+    {
+        if(random.NextInt(0, 2) == 0)
+        {
+            // only smash.  Until we have other systems working
+            FarmerIntent intent = new FarmerIntent
+            {
+                value = FarmerIntentState.TillGround,
+                elapsed = 0,
+                random = random
+            };
+
+            ColorFarmerByIntent(entityInQueryIndex, entity, intent, ref ecb);
+            ecb.SetComponent<FarmerIntent>(entityInQueryIndex, entity, intent);
+        }
+        else
+        {
+            // only smash.  Until we have other systems working
+            FarmerIntent intent = new FarmerIntent
+            {
+                value = FarmerIntentState.SmashRocks,
+                elapsed = 0,
+                random = random
+            };
+
+            ColorFarmerByIntent(entityInQueryIndex, entity, intent, ref ecb);
+            ecb.SetComponent<FarmerIntent>(entityInQueryIndex, entity, intent);
+        }
+    }
+
+    static void ColorFarmerByIntent(int entityInQueryIndex, Entity entity, in FarmerIntent intent, ref EntityCommandBuffer.ParallelWriter ecb)
+    {
+        float4 overrideColor = new float4();
+        switch (intent.value)
+        {
+            case FarmerIntentState.SmashRocks:
+                overrideColor = new float4(1, 0, 0, 1); // red
+                break;
+            case FarmerIntentState.TillGround:
+                overrideColor = new float4(1, 1, 1, 1); // white
+                break;
+            case FarmerIntentState.PlantSeeds:
+                overrideColor = new float4(0, 0.92f, 0.016f, 1); // yellow
+                break;
+            case FarmerIntentState.SellPlants:
+                overrideColor = new float4(1, 0, 1, 1); // magenta
+                break;
+        }
+
+        ecb.AddComponent<ColorOverride>(entityInQueryIndex, entity, new ColorOverride { Value = overrideColor });
     }
 }
