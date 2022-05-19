@@ -31,7 +31,7 @@ public partial class FarmerMovementSystem : SystemBase
             {
                 if( targeting.entityTarget == Entity.Null )
                 {
-                    // DEBUG: with no target keep moving arounnd randomly 
+                    // DEBUG: with no target keep moving arounnd randomly - remove when all movement is sorted
                     var pos = transform.Position;
                     pos.y = entity.Index;
                     var angle = (0.5f + noise.cnoise(pos / 10f)) * 4.0f * math.PI;

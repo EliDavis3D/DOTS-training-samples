@@ -40,7 +40,7 @@ public partial struct ActionRockBreakSystem : ISystem
             foreach (FarmerTargetingAspect instance in SystemAPI.Query<FarmerTargetingAspect>())
             {
                 FarmerIntentState intentState = instance.intent.value;
-                //if (intentState != FarmerIntentState.SmashRocks) { continue; }
+                if (intentState != FarmerIntentState.SmashRocks) { continue; }
 
                 if (instance.targeting.entityTarget == Entity.Null)
                 {
@@ -69,7 +69,7 @@ public partial struct ActionRockBreakSystem : ISystem
                             cooldownTicker = config.FarmerAttackCooldown
                         };
 
-                        if (!TryBreakRock(instance.targeting, config.RockDamagePerHit, ref state, ref ecb))
+                        if (TryBreakRock(instance.targeting, config.RockDamagePerHit, ref state, ref ecb))
                         {
                             GroundUtilities.DestroyRock(instance.targeting.entityTarget, state.EntityManager, ecb, config, ref bufferData);
 
