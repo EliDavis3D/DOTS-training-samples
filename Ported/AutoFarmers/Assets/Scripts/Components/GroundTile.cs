@@ -7,6 +7,7 @@ public enum GroundTileState : byte
     Unpassable,
     Tilled,
     Planted,
+    Silo,
 }
 
 public struct GroundTile : IBufferElementData
@@ -15,4 +16,5 @@ public struct GroundTile : IBufferElementData
 
     public Entity rockEntityByTile;
     public Entity plantEntityByTile;
+    public Entity siloEntityByTile;
 }

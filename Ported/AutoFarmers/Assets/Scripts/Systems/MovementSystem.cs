@@ -1,10 +1,6 @@
-using System.Resources;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Rendering;
-using Unity.Transforms;
 
 [BurstCompile]
 public partial struct MovementSystem : ISystem
