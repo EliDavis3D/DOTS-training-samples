@@ -27,36 +27,44 @@ public partial class FarmerFindTileToTillSystem : SystemBase
 
         int groundWidth = config.MapSize.x;
         int groundHeight = config.MapSize.y;
-        int groundArea = groundWidth * groundHeight;
         float dt = Time.DeltaTime;
 
         Random random = new Random((uint)math.abs(Time.ElapsedTime) + 1);
-        Entities.WithAll<Farmer>().WithNone<TillGroundTarget>().ForEach((Entity entity, FarmerIntent intent, ref Mover mover) =>
+        Entities.WithAll<Farmer>().WithNone<TillGroundTarget>().ForEach((Entity farmer, FarmerIntent intent, MovementAspect mover) =>
         {
             if (intent.value == FarmerIntentState.TillGround)
             {
+                //mover.WorldPosition
                 int tileIndex;
-                if (TryGetRandomOpenTile(ref random, tiles, groundArea, out tileIndex))
+                if (TryGetRandomOpenTile(ref random, tiles, config.MapSize, mover.Position, out tileIndex))
                 {
                     //float2 tileTranslation = GroundUtilities.GetTileTranslation(tileIndex, groundWidth);
                     int2 tileCoords = GroundUtilities.GetTileCoords(tileIndex, groundWidth);
                     mover.DesiredLocation = tileCoords;
                     mover.HasDestination = true;
                     tiles[tileIndex] = new GroundTile() { tileState = GroundTileState.Claimed };
-                    ecb.AddComponent<TillGroundTarget>(entity, new TillGroundTarget { tileIndex = tileIndex, tileTranslation = tileCoords });
+                    ecb.AddComponent<TillGroundTarget>(farmer, new TillGroundTarget { tileIndex = tileIndex, tileTranslation = tileCoords });
                 }
             }
         }).Schedule();
     }
 
-    private static bool TryGetRandomOpenTile(ref Random random, in DynamicBuffer<GroundTile> tiles, int groundArea, out int tileIndex)
+    private static bool TryGetRandomOpenTile(ref Random random, in DynamicBuffer<GroundTile> tiles, int2 mapSize, int2 farmerPos, out int tileIndex)
     {
+        int searchSize = 8;
+        int2 minSearch = new int2(-searchSize, -searchSize);
+        int2 maxSearch = new int2(searchSize, searchSize);
+
         tileIndex = 0;
 
         int attempts = 8;
         while (attempts > 0)
         {
-            tileIndex = random.NextInt(groundArea);
+            var rndPos = random.NextInt2(minSearch, maxSearch);
+            var tryPos = farmerPos + rndPos;
+            tryPos = math.clamp(tryPos, new int2(0, 0), new int2(mapSize.x-1, mapSize.y - 1));
+            //tileIndex = random.NextInt(map.x * map.y);
+            tileIndex = MapUtil.MapCordToIndex(mapSize, tryPos);
             GroundTileState tileState = tiles[tileIndex].tileState;
             if (tileState == GroundTileState.Open || tileState == GroundTileState.Tilled) 
                 return true;

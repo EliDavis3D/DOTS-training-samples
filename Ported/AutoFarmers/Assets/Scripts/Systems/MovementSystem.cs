@@ -37,10 +37,10 @@ partial struct MoveMovers : IJobEntity
     {
         if (mover.HasDestination)
         {
-            var dir = mover.DesiredWorldLocation - mover.Position;
             if (!mover.AtDesiredLocation)
             {
-                mover.Position += math.normalize(dir) * dt * mover.Speed;
+                var dir = mover.DesiredWorldLocation - mover.WorldPosition;
+                mover.WorldPosition += math.normalize(dir) * dt * mover.Speed;
             }
         }
     }

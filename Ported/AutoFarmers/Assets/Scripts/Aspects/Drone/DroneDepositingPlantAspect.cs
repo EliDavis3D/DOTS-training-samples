@@ -8,7 +8,7 @@ readonly partial struct DroneDepositingPlantAspect : IAspect<DroneDepositingPlan
 
     private readonly MovementAspect Movement;
 
-    private readonly RefRW<DroneDepositPlantIntent> DroneDepositPlantIntent;
+    private readonly RefRO<DroneDepositPlantIntent> DroneDepositPlantIntent;
 
     public bool AtDesiredLocation
     {

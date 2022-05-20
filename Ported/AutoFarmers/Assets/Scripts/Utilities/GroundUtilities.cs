@@ -24,9 +24,9 @@ static class GroundUtilities
         {
             for (int x = 0; x < mapSize.x; ++x)
             {
-                int index = mapSize.x * y + x;
+                int index = MapUtil.MapCordToIndex(mapSize, x, y);
 
-                if (randomGenerator.NextFloat(0f, 1f) < 0.8f)
+                if (randomGenerator.NextFloat(0f, 1f) < 0.9f)
                 {
                     groundData[index] = new GroundTile
                     {

@@ -10,10 +10,18 @@ readonly partial struct MovementAspect : IAspect<MovementAspect>
 
     private readonly RefRW<Mover> Mover;
 
-    public float3 Position
+    public float3 WorldPosition
     {
         get => Transform.Position;
         set => Transform.Position = value;
+    }
+
+    public int2 Position
+    {
+        get => new int2(
+            (int)math.round(Transform.Position.x),
+            (int)math.round(Transform.Position.z)
+        );
     }
 
     public bool HasDestination
@@ -36,7 +44,7 @@ readonly partial struct MovementAspect : IAspect<MovementAspect>
     public bool AtDesiredLocation
     {
         get {
-            return math.distancesq(DesiredWorldLocation, Position) < 0.06f;
+            return math.distancesq(DesiredWorldLocation, WorldPosition) < 0.06f;
         }
     }
 
