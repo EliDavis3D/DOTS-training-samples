@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 
 public struct FarmMoney : IComponentData
 {
@@ -9,4 +10,6 @@ public struct FarmMoney : IComponentData
     public int SpawnedFarmers;
 
     public int SpawnedDrones;
+
+    public int2 LastDepositLocaiton;
 }

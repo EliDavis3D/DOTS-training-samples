@@ -1,5 +1,4 @@
 using Unity.Entities;
-using Unity.Transforms;
 using Unity.Mathematics;
 
 readonly partial struct DroneDepositingPlantAspect : IAspect<DroneDepositingPlantAspect>
@@ -18,6 +17,7 @@ readonly partial struct DroneDepositingPlantAspect : IAspect<DroneDepositingPlan
     public int2 DesiredLocation
     {
         set => Movement.DesiredLocation = value;
+        get => Movement.DesiredLocation;
     }
     public Entity Plant
     {

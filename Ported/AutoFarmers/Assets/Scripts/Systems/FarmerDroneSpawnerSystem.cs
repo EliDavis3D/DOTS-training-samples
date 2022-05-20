@@ -33,14 +33,12 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-        Random randomGenerator = new Random((uint)gameConfig.WorldGenerationSeed);
-
         for (int i = 0; i < farmersToSpawn; i++)
         {
             var farmer = ecb.Instantiate(gameConfig.FarmerPrefab);
             ecb.AddComponent(farmer, new Translation()
             {
-                Value = new float3(randomGenerator.NextInt(0, gameConfig.MapSize.x), 0, randomGenerator.NextInt(0, gameConfig.MapSize.y)),
+                Value = new float3(money.LastDepositLocaiton.x, 0.5f, money.LastDepositLocaiton.y),
             });
             ecb.AddBuffer<Waypoint>(farmer);
             money.SpawnedFarmers += 1;
@@ -51,7 +49,7 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
             var drone = ecb.Instantiate(gameConfig.DronePrefab);
             ecb.AddComponent(drone, new Translation()
             {
-                Value = new float3(randomGenerator.NextInt(0, gameConfig.MapSize.x), 0, randomGenerator.NextInt(0, gameConfig.MapSize.y)),
+                Value = new float3(money.LastDepositLocaiton.x, 2f, money.LastDepositLocaiton.y),
             });
             ecb.AddBuffer<Waypoint>(drone);
             money.SpawnedDrones += 1;

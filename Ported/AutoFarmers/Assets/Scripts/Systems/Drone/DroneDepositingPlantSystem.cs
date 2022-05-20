@@ -23,6 +23,7 @@ public partial struct DroneDepositingPlantSystem : ISystem
         var gameConfig = SystemAPI.GetSingleton<GameConfig>();
 
         var plantsDepositted = 0;
+        int2 posDepositted = new int2();
         foreach (var drone in SystemAPI.Query<DroneDepositingPlantAspect>())
         {
             if (drone.AtDesiredLocation)
@@ -31,6 +32,7 @@ public partial struct DroneDepositingPlantSystem : ISystem
                 drone.DesiredLocation = new int2(0, -1);
                 ecb.RemoveComponent<DroneDepositPlantIntent>(drone.Self);
                 ecb.AddComponent<DroneFindPlantIntent>(drone.Self);
+                posDepositted = drone.DesiredLocation;
                 plantsDepositted++;
             }
         }
@@ -42,6 +44,7 @@ public partial struct DroneDepositingPlantSystem : ISystem
 
             money.FarmerMoney += gameConfig.MoneyPerPlant * plantsDepositted;
             money.DroneMoney += gameConfig.MoneyPerPlant * plantsDepositted;
+            money.LastDepositLocaiton = posDepositted;
             ecb.SetComponent(moneyEntity, money);
         }
 

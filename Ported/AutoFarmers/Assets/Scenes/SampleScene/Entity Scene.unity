@@ -172,8 +172,8 @@ MonoBehaviour:
   InitialFarmers: 10
   DronePrefab: {fileID: 1134412492924128211, guid: 1425d3680ab2cf84eaaebce043d03adb, type: 3}
   MapSize:
-    x: 1000
-    y: 1000
+    x: 512
+    y: 512
   GroundTileNormalPrefab: {fileID: 1929323336127539248, guid: b5010f8b2a4baa54cabb13677849a064, type: 3}
   GroundTileTilledPrefab: {fileID: 7802085535162115662, guid: 35389f0610890a24a9147d048020f130, type: 3}
   GroundTileUnpassablePrefab: {fileID: 1929323336127539248, guid: 62569570ec39fd24fa055d8801d0adb4, type: 3}
