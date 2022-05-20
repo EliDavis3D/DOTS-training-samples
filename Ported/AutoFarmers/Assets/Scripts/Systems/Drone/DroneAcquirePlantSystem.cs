@@ -51,8 +51,8 @@ public partial struct DroneAcquirePlantSystem : ISystem
                 });
 
                 var dronePos = localToWorldFromEntity[drone.Self].Position;
-                var closestPlantDistance = float.MaxValue;
-                var closestPlantPos = new float3(0, 0, 0);
+                var closestSiloDistance = float.MaxValue;
+                var closestSiloPos = new float3(0, 0, 0);
                 for (int i = 0; i < chunks.Length; i++)
                 {
                     var chunk = chunks[i];
@@ -60,21 +60,21 @@ public partial struct DroneAcquirePlantSystem : ISystem
                     for (int j = 0; j < chunk.Count; j++)
                     {
                         var silo = silos[j];
-                        var plantPos = localToWorldFromEntity[silo].Position;
+                        var siloPos = localToWorldFromEntity[silo].Position;
                        
-                        var dist = math.distancesq(plantPos, dronePos);
-                        if (dist < closestPlantDistance)
+                        var dist = math.distancesq(siloPos, dronePos);
+                        if (dist < closestSiloDistance)
                         {
-                            closestPlantDistance = dist;
-                            closestPlantPos = plantPos;
+                            closestSiloDistance = dist;
+                            closestSiloPos = siloPos;
                         }
                     }
                     silos.Dispose();
                 }
 
                 drone.DesiredLocation = new int2(
-                    UnityEngine.Mathf.RoundToInt(closestPlantPos.x),
-                    UnityEngine.Mathf.RoundToInt(closestPlantPos.z)
+                    UnityEngine.Mathf.RoundToInt(closestSiloPos.x),
+                    UnityEngine.Mathf.RoundToInt(closestSiloPos.z)
                 );
             }
         }

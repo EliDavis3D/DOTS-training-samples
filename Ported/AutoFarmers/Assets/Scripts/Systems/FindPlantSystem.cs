@@ -32,7 +32,7 @@ namespace Assets.Scripts.Systems.Drone
         public void OnUpdate(ref SystemState state)
         {
             var chunks = grownPlantsQuery.CreateArchetypeChunkArray(Allocator.Temp);
-            if(chunks.Length == 0)
+            if(chunks.Length == 0 || (chunks.Length == 1 && chunks[0].Count == 0))
             {
                 return;
             }
@@ -96,6 +96,7 @@ namespace Assets.Scripts.Systems.Drone
             }
 
             chunks.Dispose();
+            claimedPlants.Dispose();
         }
     }
 }

@@ -29,7 +29,6 @@ public partial struct DroneDepositingPlantSystem : ISystem
             if (drone.AtDesiredLocation)
             {
                 ecb.DestroyEntity(drone.Plant);
-                drone.DesiredLocation = new int2(0, -1);
                 ecb.RemoveComponent<DroneDepositPlantIntent>(drone.Self);
                 ecb.AddComponent<DroneFindPlantIntent>(drone.Self);
                 posDepositted = drone.DesiredLocation;
