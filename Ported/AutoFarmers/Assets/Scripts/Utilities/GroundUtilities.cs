@@ -5,18 +5,18 @@ using Unity.Transforms;
 
 static class GroundUtilities
 {
-    public static void GenerateGroundAndRocks(EntityCommandBuffer ecb, in GameConfig config, in Allocator allocator)
+    public static void GenerateGroundAndRocks(EntityManager em, in GameConfig config, in Allocator allocator)
     {
         int2 mapSize = config.MapSize;
 
         NativeArray<Entity> groundTileEntities = CollectionHelper.CreateNativeArray<Entity>(
             mapSize.x * mapSize.y, allocator);
-        ecb.Instantiate(config.GroundTileNormalPrefab, groundTileEntities);
+        em.Instantiate(config.GroundTileNormalPrefab, groundTileEntities);
 
         // Create Ground
-        Entity groundEntity = ecb.CreateEntity();
-        ecb.AddComponent<Ground>(groundEntity);
-        DynamicBuffer<GroundTile> groundData = ecb.AddBuffer<GroundTile>(groundEntity);
+        Entity groundEntity = em.CreateEntity();
+        em.AddComponent<Ground>(groundEntity);
+        DynamicBuffer<GroundTile> groundData = em.AddBuffer<GroundTile>(groundEntity);
         groundData.Length = mapSize.x * mapSize.y;
 
         Random randomGenerator = new Random((uint)config.WorldGenerationSeed);
@@ -26,7 +26,7 @@ static class GroundUtilities
             {
                 int index = mapSize.x * y + x;
 
-                if (randomGenerator.NextFloat(0f, 1f) < 0.9)
+                if (randomGenerator.NextFloat(0f, 1f) < 0.8f)
                 {
                     groundData[index] = new GroundTile
                     {
@@ -35,24 +35,11 @@ static class GroundUtilities
                         siloEntityByTile = Entity.Null,
                         plantEntityByTile = Entity.Null
                     };
-                } else if (randomGenerator.NextFloat(0f, 1f) < 0.8)
+                }
+                else if(randomGenerator.NextFloat(0f, 1f) < 0.05f)
                 {
-                    var plant = ecb.Instantiate(config.PlantPrefab);
-                    ecb.SetComponent<Translation>(plant, new Translation
-                    {
-                        Value = new float3(x, .2f, y),
-                    });
-                    groundData[index] = new GroundTile
-                    {
-                        tileState = GroundTileState.Planted,
-                        rockEntityByTile = Entity.Null,
-                        plantEntityByTile = plant,
-                        siloEntityByTile = Entity.Null,
-                    };
-                } else
-                {
-                    var silo = ecb.Instantiate(config.SiloPrefab);
-                    ecb.SetComponent<Translation>(silo, new Translation
+                    var silo = em.Instantiate(config.SiloPrefab);
+                    em.SetComponentData<Translation>(silo, new Translation
                     {
                         Value = new float3(x, .2f, y),
                     });
@@ -65,11 +52,11 @@ static class GroundUtilities
                     };
                 }
 
-                ecb.SetComponent(groundTileEntities[index], new GroundTileView
+                em.SetComponentData(groundTileEntities[index], new GroundTileView
                 {
                     Index = index
                 });
-                ecb.SetComponent(groundTileEntities[index], new Translation
+                em.SetComponentData(groundTileEntities[index], new Translation
                 {
                     Value = new float3(x, 0, y)
                 });
@@ -78,7 +65,7 @@ static class GroundUtilities
 
         for (int i = 0; i < config.InitialRockAttempts; ++i)
         {
-            TryGenerateRock(ecb, config, ref groundData, ref randomGenerator);
+            TryGenerateRock(em, config, groundEntity, ref randomGenerator);
         }
     }
 
@@ -92,6 +79,14 @@ static class GroundUtilities
         int y = index / groundWidth;
         int x = index % groundWidth;
         return new int2(x, y);
+    }
+
+    public static bool TryGetTileCoords(in float3 position, in int groundWidth, in int groundHeight, out int2 result)
+    {
+        Translation translation = new Translation() {
+            Value = new float3(position.x, 0, position.y)
+        };
+        return TryGetTileCoords(translation, groundWidth, groundHeight, out result);
     }
 
     public static bool TryGetTileCoords(in Translation translation, in int groundWidth, in int groundHeight, out int2 result)
@@ -113,6 +108,7 @@ static class GroundUtilities
         return true;
     }
 
+
     public static float2 GetTileTranslation(in int tileIndex, in int groundWidth)
     {
         int2 coordinates = GetTileCoords(tileIndex, groundWidth);
@@ -123,11 +119,12 @@ static class GroundUtilities
 
     #region Rock Lifecycle Helpers
     public static bool TryGenerateRock(
-        EntityCommandBuffer ecb,
+        EntityManager em,
         in GameConfig config,
-        ref DynamicBuffer<GroundTile> groundData,
+        in Entity groundEntity,
         ref Random randomGenerator)
     {
+        var groundData = em.GetBuffer<GroundTile>(groundEntity);
 
         float2 size = new float2(
             randomGenerator.NextFloat(config.MinRockSize, config.MaxRockSize),
@@ -152,25 +149,26 @@ static class GroundUtilities
 
         float health = (size.x) * (size.y) * config.RockHealthPerUnitArea;
 
-        Entity rockEntity = ecb.Instantiate(config.RockPrefab);
-        ecb.SetComponent(rockEntity, new Translation
+        Entity rockEntity = em.Instantiate(config.RockPrefab);
+        em.SetComponentData(rockEntity, new Translation
         {
             Value = rockCenter
         });
-        ecb.AddComponent(rockEntity, new NonUniformScale
+        em.AddComponentData(rockEntity, new NonUniformScale
         {
             Value = rockSize
         });
-        ecb.SetComponent(rockEntity, new Rock
+        em.SetComponentData(rockEntity, new Rock
         {
             size = rockSize,
             initialHealth = health
         });
-        ecb.SetComponent(rockEntity, new RockHealth
+        em.SetComponentData(rockEntity, new RockHealth
         {
             Value = health,
         });
 
+        groundData = em.GetBuffer<GroundTile>(groundEntity);
         SetAllTilesInRangeTo(GroundTileState.Unpassable, rockEntity, ref groundData, minTile, maxTile, config.MapSize.x);
 
         return true;

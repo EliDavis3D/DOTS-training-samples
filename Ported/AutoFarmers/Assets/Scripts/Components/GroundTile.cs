@@ -8,6 +8,7 @@ public enum GroundTileState : byte
     Tilled,
     Planted,
     Silo,
+    Claimed, // Tile is in-processe of being modified (to another state) so consider it inactive.
 }
 
 public struct GroundTile : IBufferElementData

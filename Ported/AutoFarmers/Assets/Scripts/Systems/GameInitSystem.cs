@@ -48,10 +48,7 @@ public partial struct GameInitSystem : ISystem
         var allocator = state.WorldUnmanaged.UpdateAllocator.ToAllocator;
         var config = SystemAPI.GetSingleton<GameConfig>();
 
-        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-
-        GroundUtilities.GenerateGroundAndRocks(ecb, config, allocator);
+        GroundUtilities.GenerateGroundAndRocks(state.EntityManager, config, allocator);
 
         // Initial Farmer
 

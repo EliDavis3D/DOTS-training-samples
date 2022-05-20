@@ -7,6 +7,7 @@ public partial struct DroneDepositingPlantSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<GameConfig>();
     }
 
     public void OnDestroy(ref SystemState state)
