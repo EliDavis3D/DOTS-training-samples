@@ -78,7 +78,7 @@ partial struct PathfindingSystem : ISystem
             };
 
             // Schedule execution in a single thread, and do not block main thread.
-            findPathJob.Schedule();
+            state.Dependency = findPathJob.Schedule(state.Dependency);
 
             //var testJob = new printJob();
             //testJob.Schedule();

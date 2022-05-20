@@ -36,37 +36,64 @@ public partial struct GroundViewMatchingSystem : ISystem
         Entity groundEntity = SystemAPI.GetSingletonEntity<Ground>();
 
         BufferFromEntity<GroundTile> groundDataLookup = state.GetBufferFromEntity<GroundTile>(true);
-        if (groundDataLookup.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> bufferData) )
+        if (!groundDataLookup.TryGetBuffer(groundEntity, out DynamicBuffer<GroundTile> bufferData))
         {
-            foreach (var instance in SystemAPI.Query<GroundTileAspect>())
-            {
-                GroundTileState tileState = bufferData[instance.tileView.Index].tileState;
-
-                if (tileState != instance.tileView.ViewState)
-                {
-                    MaterialMeshInfo meshInfo = instance.meshInfo;
-                    if (GroundUtilities.IsTileTilled(tileState))
-                    {
-                        meshInfo.Material = tilledMaterialId;
-                    }
-                    else if (!GroundUtilities.IsTilePassable(tileState))
-                    {
-                        meshInfo.Material = unpassableMaterialId;
-                    }
-                    else
-                    {
-                        meshInfo.Material = normalMaterialId;
-                    }
-                    instance.meshInfo = meshInfo;
-
-                    GroundTileView tileView = instance.tileView;
-                    tileView.ViewState = tileState;
-                    instance.tileView = tileView;
-                }
-            }
+            return;
         }
+
+        var updateVisualsJob = new GroundVisualUpdater
+        {
+            tilledMaterialId = tilledMaterialId,
+            unpassableMaterialId = unpassableMaterialId,
+            normalMaterialId = normalMaterialId,
+
+            ecb = ecb.AsParallelWriter(),
+            GroundData = bufferData
+        };
+
+        // Schedule execution in a single thread, and do not block main thread.
+        state.Dependency = updateVisualsJob.ScheduleParallel(state.Dependency);
     }
 }
 
-// on the ground entity singleton - maybe don't put in here?
-//readonly RefRO<GroundTileState> tileStateBufferRef;
+
+
+[BurstCompile]
+partial struct GroundVisualUpdater : IJobEntity
+{
+    public int tilledMaterialId;
+    public int unpassableMaterialId;
+    public int normalMaterialId;
+
+    public EntityCommandBuffer.ParallelWriter ecb;
+
+    [ReadOnly]
+    public DynamicBuffer<GroundTile> GroundData;
+
+    void Execute(ref GroundTileAspect instance, [ChunkIndexInQuery] int chunkIndex)
+    {
+        GroundTileState tileState = GroundData[instance.tileView.Index].tileState;
+
+        if (tileState != instance.tileView.ViewState)
+        {
+            MaterialMeshInfo meshInfo = instance.meshInfo;
+            if (GroundUtilities.IsTileTilled(tileState))
+            {
+                meshInfo.Material = tilledMaterialId;
+            }
+            else if (!GroundUtilities.IsTilePassable(tileState))
+            {
+                meshInfo.Material = unpassableMaterialId;
+            }
+            else
+            {
+                meshInfo.Material = normalMaterialId;
+            }
+            ecb.SetComponent(chunkIndex, instance.self, meshInfo);
+
+            GroundTileView tileView = instance.tileView;
+            tileView.ViewState = tileState;
+            ecb.SetComponent(chunkIndex, instance.self, tileView);
+        }
+    }
+}
