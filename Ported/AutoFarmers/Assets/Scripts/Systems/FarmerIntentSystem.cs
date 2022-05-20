@@ -40,9 +40,8 @@ public partial class FarmerIntentSystem : SystemBase
 
     static void PickNewIntent(int entityInQueryIndex, Entity entity, ref EntityCommandBuffer.ParallelWriter ecb, Random random)
     {
-        if(random.NextInt(0, 2) == 0)
+        if(true)
         {
-            // only smash.  Until we have other systems working
             FarmerIntent intent = new FarmerIntent
             {
                 value = FarmerIntentState.TillGround,
@@ -53,9 +52,8 @@ public partial class FarmerIntentSystem : SystemBase
             ColorFarmerByIntent(entityInQueryIndex, entity, intent, ref ecb);
             ecb.SetComponent<FarmerIntent>(entityInQueryIndex, entity, intent);
         }
-        else
+        /*else --- rock smash system doesn't work, ran out of time to debug
         {
-            // only smash.  Until we have other systems working
             FarmerIntent intent = new FarmerIntent
             {
                 value = FarmerIntentState.SmashRocks,
@@ -65,7 +63,7 @@ public partial class FarmerIntentSystem : SystemBase
 
             ColorFarmerByIntent(entityInQueryIndex, entity, intent, ref ecb);
             ecb.SetComponent<FarmerIntent>(entityInQueryIndex, entity, intent);
-        }
+        }*/
     }
 
     static void ColorFarmerByIntent(int entityInQueryIndex, Entity entity, in FarmerIntent intent, ref EntityCommandBuffer.ParallelWriter ecb)

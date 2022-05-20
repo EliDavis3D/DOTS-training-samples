@@ -5,7 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
-
+/*
 [BurstCompile]
 public partial struct ActionRockBreakSystem : ISystem
 {
@@ -193,3 +193,4 @@ public partial struct ActionRockBreakSystem : ISystem
         };
     }
 }
+*/
