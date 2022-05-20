@@ -16,16 +16,31 @@ public partial struct MovementSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        var dt = state.Time.DeltaTime;
-        foreach (var mover in SystemAPI.Query<MovementAspect>())
+        var moveMoversJob = new MoveMovers
         {
-            if (mover.HasDestination)
+            dt = state.Time.DeltaTime
+        };
+
+        // Schedule execution in a single thread, and do not block main thread.
+        state.Dependency = moveMoversJob.ScheduleParallel(state.Dependency);
+
+    }
+}
+
+
+[BurstCompile]
+partial struct MoveMovers : IJobEntity
+{
+    public float dt;
+
+    void Execute(ref MovementAspect mover)
+    {
+        if (mover.HasDestination)
+        {
+            var dir = mover.DesiredWorldLocation - mover.Position;
+            if (!mover.AtDesiredLocation)
             {
-                var dir = mover.DesiredWorldLocation - mover.Position;
-                if (!mover.AtDesiredLocation)
-                {
-                    mover.Position += math.normalize(dir) * dt * mover.Speed;
-                }
+                mover.Position += math.normalize(dir) * dt * mover.Speed;
             }
         }
     }
