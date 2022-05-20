@@ -33,12 +33,21 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
+        var posToSpawn = new int2(
+                gameConfig.MapSize.x / 2,
+                gameConfig.MapSize.y / 2
+        );
+        if (money.LastDepositLocaiton.x != 0 && money.LastDepositLocaiton.y != 0)
+        {
+            posToSpawn = money.LastDepositLocaiton;
+        }
+
         for (int i = 0; i < farmersToSpawn; i++)
         {
             var farmer = ecb.Instantiate(gameConfig.FarmerPrefab);
-            ecb.AddComponent(farmer, new Translation()
+            ecb.SetComponent(farmer, new Translation()
             {
-                Value = new float3(money.LastDepositLocaiton.x, 0.5f, money.LastDepositLocaiton.y),
+                Value = new float3(posToSpawn.x, 0.5f, posToSpawn.y),
             });
             ecb.AddBuffer<Waypoint>(farmer);
             money.SpawnedFarmers += 1;
@@ -47,15 +56,15 @@ public partial struct FarmerDroneSpawnerSystem : ISystem
         for (int i = 0; i < dronesToSpawn; i++)
         {
             var drone = ecb.Instantiate(gameConfig.DronePrefab);
-            ecb.AddComponent(drone, new Translation()
+            ecb.SetComponent(drone, new Translation()
             {
-                Value = new float3(money.LastDepositLocaiton.x, 2f, money.LastDepositLocaiton.y),
+                Value = new float3(posToSpawn.x, 2f, posToSpawn.y),
             });
-            ecb.AddBuffer<Waypoint>(drone);
+            //ecb.AddBuffer<Waypoint>(drone);
             money.SpawnedDrones += 1;
+            //UnityEngine.Debug.Log("Drones Spawned: "+ money.SpawnedDrones);
         }
 
         ecb.SetComponent(moneyEntity, money);
-        ecb.ShouldPlayback = true;
     }
 }

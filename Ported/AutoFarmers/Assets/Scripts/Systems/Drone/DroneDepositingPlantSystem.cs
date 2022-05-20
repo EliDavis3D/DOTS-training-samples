@@ -21,6 +21,7 @@ public partial struct DroneDepositingPlantSystem : ISystem
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
         var gameConfig = SystemAPI.GetSingleton<GameConfig>();
+        
 
         var plantsDepositted = 0;
         int2 posDepositted = new int2();

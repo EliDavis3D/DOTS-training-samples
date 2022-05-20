@@ -7,6 +7,7 @@ readonly partial struct DroneFindPlantAspect : IAspect<DroneFindPlantAspect>
 {
     public readonly Entity Self;
     private readonly RefRW<Mover> Mover;
+    private readonly RefRO<DroneFindPlantIntent> Intent;
 
     public int2 DesiredLocation
     {

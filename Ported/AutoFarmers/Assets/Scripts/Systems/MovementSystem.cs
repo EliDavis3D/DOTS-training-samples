@@ -23,7 +23,6 @@ public partial struct MovementSystem : ISystem
 
         // Schedule execution in a single thread, and do not block main thread.
         state.Dependency = moveMoversJob.ScheduleParallel(state.Dependency);
-
     }
 }
 
